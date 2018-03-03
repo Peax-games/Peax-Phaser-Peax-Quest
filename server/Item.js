@@ -64,9 +64,9 @@ Item.prototype.setContent = function(){
     if(this.content === undefined) this.content = 'item-flask';
     var content = this.content.split(",");
     var item = (this.chest ? "item-" : "")+content[Math.floor(Math.random()*content.length)];
-    var itemID = (GameServer.db.items[item] ? GameServer.db.items[item].id : 100);
-    this.itemKey = item;
-    this.setProperty('itemID',itemID);
+    // var itemID = (GameServer.db.items[item] ? GameServer.db.items[item].id : 100);
+    // this.itemKey = item;
+    // this.setProperty('itemID',itemID);
 };
 
 module.exports.Item = Item;
