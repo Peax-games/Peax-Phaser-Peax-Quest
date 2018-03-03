@@ -46,7 +46,7 @@ app.use(express.static(__dirname + '/public'));
 // Manage command line arguments
 var myArgs = require('optimist').argv;
 var mongoHost, mongoDBName;
-
+//----------------------------------------------------------------------------------------
 function sleep(milliseconds) {
     console.log('Waiting for database - start: ' + new Date().getTime());
     var start = new Date().getTime();
@@ -66,8 +66,8 @@ if(myArgs.heroku){ // --heroku flag to behave according to Heroku's specs
     mongoHost = 'heroku_4tv68zls:'+myArgs.pass+'@ds141368.mlab.com:41368';
     mongoDBName = 'heroku_4tv68zls';
 }else {
-    var mongoPort = (myArgs.mongoPort || 27017);
-    var mongoServer = (myArgs.mongoServer || 'localhost');
+    var mongoPort = (/*myArgs.mongoPort || */27017);
+    var mongoServer = (/*myArgs.mongoServer || */'localhost');
     mongoHost = mongoServer+':'+mongoPort;
     mongoDBName = 'phaserQuest';
 }
@@ -84,6 +84,8 @@ server.listen(myArgs.p || process.env.PORT || 8081,function(){ // -p flag to spe
         console.log('Connection to db established');
     });
 });
+
+// ------------------------------------------------------------------------
 
 io.on('connection',function(socket){
     console.log('connection with ID '+socket.id);
