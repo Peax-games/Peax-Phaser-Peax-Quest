@@ -5,6 +5,7 @@ import PeaxQuest from './Game/Peax-Quest';
 
 class App extends Component {
   render() {
+    PeaxQuest();
     return (
       <div id="myCanvas">
         

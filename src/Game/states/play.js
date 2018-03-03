@@ -1,6 +1,10 @@
 import io from 'socket.io-client';
 
 export default function playState(game) {
+
+    var EasyStar=function(t){function n(o){if(e[o])return e[o].exports;var i=e[o]={exports:{},id:o,loaded:!1};return t[o].call(i.exports,i,i.exports,n),i.loaded=!0,i.exports}var e={};return n.m=t,n.c=e,n.p="",n(0)}([function(t,n,e){var o={},i=e(1),r=e(2),s=e(3);const a=0,u=1;t.exports=o,o.js=function(){var t,n,e,o=1,c=1.4,l=!1,h={},p={},f={},d=!0,y=[],v=Number.MAX_VALUE,g=!1;this.setAcceptableTiles=function(t){t instanceof Array?e=t:!isNaN(parseFloat(t))&&isFinite(t)&&(e=[t])},this.enableSync=function(){l=!0},this.disableSync=function(){l=!1},this.enableDiagonals=function(){g=!0},this.disableDiagonals=function(){g=!1},this.setGrid=function(n){t=n;for(var e=0;e<t.length;e++)for(var o=0;o<t[0].length;o++)p[t[e][o]]||(p[t[e][o]]=1)},this.setTileCost=function(t,n){p[t]=n},this.setAdditionalPointCost=function(t,n,e){f[t+"_"+n]=e},this.removeAdditionalPointCost=function(t,n){delete f[t+"_"+n]},this.removeAllAdditionalPointCosts=function(){f={}},this.setIterationsPerCalculation=function(t){v=t},this.avoidAdditionalPoint=function(t,n){h[t+"_"+n]=1},this.stopAvoidingAdditionalPoint=function(t,n){delete h[t+"_"+n]},this.enableCornerCutting=function(){d=!0},this.disableCornerCutting=function(){d=!1},this.stopAvoidingAllAdditionalPoints=function(){h={}},this.findPath=function(n,r,a,u,c){var h=function(t){l?c(t):setTimeout(function(){c(t)})};if(void 0===e)throw new Error("You can't set a path without first calling setAcceptableTiles() on EasyStar.");if(void 0===t)throw new Error("You can't set a path without first calling setGrid() on EasyStar.");if(0>n||0>r||0>a||0>u||n>t[0].length-1||r>t.length-1||a>t[0].length-1||u>t.length-1)throw new Error("Your start or end point is outside the scope of your grid.");if(n===a&&r===u)return void h([]);for(var p=t[u][a],f=!1,d=0;d<e.length;d++)if(p===e[d]){f=!0;break}if(f===!1)return void h(null);var v=new i;v.openList=new s(function(t,n){return t.bestGuessDistance()-n.bestGuessDistance()}),v.isDoneCalculating=!1,v.nodeHash={},v.startX=n,v.startY=r,v.endX=a,v.endY=u,v.callback=h,v.openList.push(A(v,v.startX,v.startY,null,o)),y.push(v)},this.calculate=function(){if(0!==y.length&&void 0!==t&&void 0!==e)for(n=0;v>n;n++){if(0===y.length)return;if(l&&(n=0),0!==y[0].openList.size()){var i=y[0].openList.pop();if(y[0].endX===i.x&&y[0].endY===i.y){y[0].isDoneCalculating=!0;var r=[];r.push({x:i.x,y:i.y});for(var s=i.parent;null!=s;)r.push({x:s.x,y:s.y}),s=s.parent;r.reverse();var u=y[0],h=r;return void u.callback(h)}var p=[];i.list=a,i.y>0&&p.push({instance:y[0],searchNode:i,x:0,y:-1,cost:o*m(i.x,i.y-1)}),i.x<t[0].length-1&&p.push({instance:y[0],searchNode:i,x:1,y:0,cost:o*m(i.x+1,i.y)}),i.y<t.length-1&&p.push({instance:y[0],searchNode:i,x:0,y:1,cost:o*m(i.x,i.y+1)}),i.x>0&&p.push({instance:y[0],searchNode:i,x:-1,y:0,cost:o*m(i.x-1,i.y)}),g&&(i.x>0&&i.y>0&&(d||b(t,e,i.x,i.y-1)&&b(t,e,i.x-1,i.y))&&p.push({instance:y[0],searchNode:i,x:-1,y:-1,cost:c*m(i.x-1,i.y-1)}),i.x<t[0].length-1&&i.y<t.length-1&&(d||b(t,e,i.x,i.y+1)&&b(t,e,i.x+1,i.y))&&p.push({instance:y[0],searchNode:i,x:1,y:1,cost:c*m(i.x+1,i.y+1)}),i.x<t[0].length-1&&i.y>0&&(d||b(t,e,i.x,i.y-1)&&b(t,e,i.x+1,i.y))&&p.push({instance:y[0],searchNode:i,x:1,y:-1,cost:c*m(i.x+1,i.y-1)}),i.x>0&&i.y<t.length-1&&(d||b(t,e,i.x,i.y+1)&&b(t,e,i.x-1,i.y))&&p.push({instance:y[0],searchNode:i,x:-1,y:1,cost:c*m(i.x-1,i.y+1)}));for(var f=!1,A=0;A<p.length;A++)if(x(p[A].instance,p[A].searchNode,p[A].x,p[A].y,p[A].cost),p[A].instance.isDoneCalculating===!0){f=!0;break}f&&y.shift()}else{var u=y[0];u.callback(null),y.shift()}}};var x=function(n,o,i,r,s){var a=o.x+i,c=o.y+r;if(void 0===h[a+"_"+c]&&b(t,e,a,c)){var l=A(n,a,c,o,s);void 0===l.list?(l.list=u,n.openList.push(l)):o.costSoFar+s<l.costSoFar&&(l.costSoFar=o.costSoFar+s,l.parent=o,n.openList.updateItem(l))}},b=function(t,n,e,o){for(var i=0;i<n.length;i++)if(t[o][e]===n[i])return!0;return!1},m=function(n,e){return f[n+"_"+e]||p[t[e][n]]},A=function(t,n,e,o,i){if(void 0!==t.nodeHash[n+"_"+e])return t.nodeHash[n+"_"+e];var s=w(n,e,t.endX,t.endY);if(null!==o)var a=o.costSoFar+i;else a=0;var u=new r(o,n,e,a,s);return t.nodeHash[n+"_"+e]=u,u},w=function(t,n,e,o){if(g){var i=Math.abs(t-e),r=Math.abs(n-o);return r>i?c*i+r:c*r+i}var i=Math.abs(t-e),r=Math.abs(n-o);return i+r}}},function(t,n){t.exports=function(){this.isDoneCalculating=!0,this.pointsToAvoid={},this.startX,this.callback,this.startY,this.endX,this.endY,this.nodeHash={},this.openList}},function(t,n){t.exports=function(t,n,e,o,i){this.parent=t,this.x=n,this.y=e,this.costSoFar=o,this.simpleDistanceToTarget=i,this.bestGuessDistance=function(){return this.costSoFar+this.simpleDistanceToTarget}}},function(t,n,e){t.exports=e(4)},function(t,n,e){var o,i,r;(function(){var e,s,a,u,c,l,h,p,f,d,y,v,g,x,b;a=Math.floor,d=Math.min,s=function(t,n){return n>t?-1:t>n?1:0},f=function(t,n,e,o,i){var r;if(null==e&&(e=0),null==i&&(i=s),0>e)throw new Error("lo must be non-negative");for(null==o&&(o=t.length);o>e;)r=a((e+o)/2),i(n,t[r])<0?o=r:e=r+1;return[].splice.apply(t,[e,e-e].concat(n)),n},l=function(t,n,e){return null==e&&(e=s),t.push(n),x(t,0,t.length-1,e)},c=function(t,n){var e,o;return null==n&&(n=s),e=t.pop(),t.length?(o=t[0],t[0]=e,b(t,0,n)):o=e,o},p=function(t,n,e){var o;return null==e&&(e=s),o=t[0],t[0]=n,b(t,0,e),o},h=function(t,n,e){var o;return null==e&&(e=s),t.length&&e(t[0],n)<0&&(o=[t[0],n],n=o[0],t[0]=o[1],b(t,0,e)),n},u=function(t,n){var e,o,i,r,u,c;for(null==n&&(n=s),r=function(){c=[];for(var n=0,e=a(t.length/2);e>=0?e>n:n>e;e>=0?n++:n--)c.push(n);return c}.apply(this).reverse(),u=[],o=0,i=r.length;i>o;o++)e=r[o],u.push(b(t,e,n));return u},g=function(t,n,e){var o;return null==e&&(e=s),o=t.indexOf(n),-1!==o?(x(t,0,o,e),b(t,o,e)):void 0},y=function(t,n,e){var o,i,r,a,c;if(null==e&&(e=s),i=t.slice(0,n),!i.length)return i;for(u(i,e),c=t.slice(n),r=0,a=c.length;a>r;r++)o=c[r],h(i,o,e);return i.sort(e).reverse()},v=function(t,n,e){var o,i,r,a,l,h,p,y,v,g;if(null==e&&(e=s),10*n<=t.length){if(a=t.slice(0,n).sort(e),!a.length)return a;for(r=a[a.length-1],y=t.slice(n),l=0,p=y.length;p>l;l++)o=y[l],e(o,r)<0&&(f(a,o,0,null,e),a.pop(),r=a[a.length-1]);return a}for(u(t,e),g=[],i=h=0,v=d(n,t.length);v>=0?v>h:h>v;i=v>=0?++h:--h)g.push(c(t,e));return g},x=function(t,n,e,o){var i,r,a;for(null==o&&(o=s),i=t[e];e>n&&(a=e-1>>1,r=t[a],o(i,r)<0);)t[e]=r,e=a;return t[e]=i},b=function(t,n,e){var o,i,r,a,u;for(null==e&&(e=s),i=t.length,u=n,r=t[n],o=2*n+1;i>o;)a=o+1,i>a&&!(e(t[o],t[a])<0)&&(o=a),t[n]=t[o],n=o,o=2*n+1;return t[n]=r,x(t,u,n,e)},e=function(){function t(t){this.cmp=null!=t?t:s,this.nodes=[]}return t.push=l,t.pop=c,t.replace=p,t.pushpop=h,t.heapify=u,t.updateItem=g,t.nlargest=y,t.nsmallest=v,t.prototype.push=function(t){return l(this.nodes,t,this.cmp)},t.prototype.pop=function(){return c(this.nodes,this.cmp)},t.prototype.peek=function(){return this.nodes[0]},t.prototype.contains=function(t){return-1!==this.nodes.indexOf(t)},t.prototype.replace=function(t){return p(this.nodes,t,this.cmp)},t.prototype.pushpop=function(t){return h(this.nodes,t,this.cmp)},t.prototype.heapify=function(){return u(this.nodes,this.cmp)},t.prototype.updateItem=function(t){return g(this.nodes,t,this.cmp)},t.prototype.clear=function(){return this.nodes=[]},t.prototype.empty=function(){return 0===this.nodes.length},t.prototype.size=function(){return this.nodes.length},t.prototype.clone=function(){var n;return n=new t,n.nodes=this.nodes.slice(0),n},t.prototype.toArray=function(){return this.nodes.slice(0)},t.prototype.insert=t.prototype.push,t.prototype.top=t.prototype.peek,t.prototype.front=t.prototype.peek,t.prototype.has=t.prototype.contains,t.prototype.copy=t.prototype.clone,t}(),function(e,s){return i=[],o=s,r="function"==typeof o?o.apply(n,i):o,!(void 0!==r&&(t.exports=r))}(this,function(){return e})}).call(this)}]);
+
+
     var Client = {};
     var playerMap = {};
     var map;
@@ -9,6 +13,14 @@ export default function playState(game) {
     var socket;
     var HUD;
     var HPGroup
+
+    var eventsQueue = []; // when events arrive before the flag playerIsInitialized is set to true, they are not processed
+    // and instead are queued in this array ; they will be processed once the client is initialized and Client.emptyQueue() has been called
+    var initEventName = 'init'; // name of the event that triggers the call to initWorld() and the initialization of the game
+    var storageNameKey = 'playerName'; // key in localStorage of the player name
+    var storageIDKey = 'playerID'; // key in localStorage of player ID
+
+    var onevent;
 
     var orientationsDict = {
         1: 'left',
@@ -33,131 +45,131 @@ export default function playState(game) {
         }
     };
 
-/**
- * Created by Jerome on 21-01-17.
- */
+    /**
+     * Created by Jerome on 21-01-17.
+     */
 
-var AOIutils = {
-    nbAOIhorizontal: 0,
-    lastAOIid: 0
-};
-/**
- * Created by Jerome on 09-11-16.
- */
+    var AOIutils = {
+        nbAOIhorizontal: 0,
+        lastAOIid: 0
+    };
+    /**
+     * Created by Jerome on 09-11-16.
+     */
 
-// A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
-// that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position.
-function spaceMap(){}
+    // A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
+    // that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position.
+    function spaceMap() { }
 
-spaceMap.prototype.add = function(x,y,object){
-    if(!this.hasOwnProperty(x)){
-        this[x] = {};
-    }
-    if(!this[x].hasOwnProperty(y)){
-        this[x][y] = [];
-    }
-    this[x][y].push(object);
-};
-
-spaceMap.prototype.delete = function(x,y,object){
-    if(!this.hasOwnProperty(x) ||!this[x].hasOwnProperty(y)) return;
-    var idx = this[x][y].indexOf(object);
-    if (idx >= 0) this[x][y].splice( idx, 1 );
-};
-
-spaceMap.prototype.move = function(x1,y1,x2,y2,object){
-    this.delete(x1,y1,object);
-    this.add(x2,y2,object);
-};
-
-spaceMap.prototype.get = function(x,y){
-    if(!this.hasOwnProperty(x)){
-        return null;
-    }
-    if(!this[x].hasOwnProperty(y)){
-        return null;
-    }
-    return this[x][y];
-};
-
-spaceMap.prototype.getFirst = function(x,y){
-    var objects = this.get(x,y);
-    return (objects ? objects[0] : null);
-};
-
-spaceMap.prototype.getFirstFiltered = function(x,y,filters,notFilters){
-    // filters is an array of property names that need to be true
-    // notFilters is an array of property names that need to be false
-    // Returns the first entity at the given position, for which the values in filters are true and the values in notFilters are false
-    // e.g. return the first item on a given cell that is visible but is not a chest
-    if(notFilters === undefined) notFilters = [];
-    var objects = this.get(x,y);
-    if(!objects) return null;
-    for(var o = 0; o < objects.length; o++){
-        var ok = true;
-        for(var f = 0; f < filters.length; f++){
-            if(!objects[o][filters[f]]) {
-                ok = false;
-                break;
-            }
+    spaceMap.prototype.add = function (x, y, object) {
+        if (!this.hasOwnProperty(x)) {
+            this[x] = {};
         }
-        if(!ok) return null;
-        for(var f = 0; f < notFilters.length; f++){
-            if(objects[o][notFilters[f]]) {
-                ok = false;
-                break;
-            }
+        if (!this[x].hasOwnProperty(y)) {
+            this[x][y] = [];
         }
-        if(ok) return objects[o];
-    }
-    return null;
-};
+        this[x][y].push(object);
+    };
 
-spaceMap.prototype.getAll = function(fnCall){
-    var l = [];
-    for(var i = 0; i < Object.keys(this).length; i++) { // NB: If use forEach instead, "this" won't refer to the object!
-        var x = Object.keys(this)[i];
-        if (this.hasOwnProperty(x)) {
-            for(var j = 0; j < Object.keys(this[x]).length; j++) {
-                var y = Object.keys(this[x])[j];
-                if (this[x].hasOwnProperty(y)){
-                    if(fnCall){
-                        for(var k = 0; k < this[x][y].length; k++){
-                            l.push(this[x][y][k][fnCall]());
+    spaceMap.prototype.delete = function (x, y, object) {
+        if (!this.hasOwnProperty(x) || !this[x].hasOwnProperty(y)) return;
+        var idx = this[x][y].indexOf(object);
+        if (idx >= 0) this[x][y].splice(idx, 1);
+    };
+
+    spaceMap.prototype.move = function (x1, y1, x2, y2, object) {
+        this.delete(x1, y1, object);
+        this.add(x2, y2, object);
+    };
+
+    spaceMap.prototype.get = function (x, y) {
+        if (!this.hasOwnProperty(x)) {
+            return null;
+        }
+        if (!this[x].hasOwnProperty(y)) {
+            return null;
+        }
+        return this[x][y];
+    };
+
+    spaceMap.prototype.getFirst = function (x, y) {
+        var objects = this.get(x, y);
+        return (objects ? objects[0] : null);
+    };
+
+    spaceMap.prototype.getFirstFiltered = function (x, y, filters, notFilters) {
+        // filters is an array of property names that need to be true
+        // notFilters is an array of property names that need to be false
+        // Returns the first entity at the given position, for which the values in filters are true and the values in notFilters are false
+        // e.g. return the first item on a given cell that is visible but is not a chest
+        if (notFilters === undefined) notFilters = [];
+        var objects = this.get(x, y);
+        if (!objects) return null;
+        for (var o = 0; o < objects.length; o++) {
+            var ok = true;
+            for (var f = 0; f < filters.length; f++) {
+                if (!objects[o][filters[f]]) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok) return null;
+            for (var f = 0; f < notFilters.length; f++) {
+                if (objects[o][notFilters[f]]) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) return objects[o];
+        }
+        return null;
+    };
+
+    spaceMap.prototype.getAll = function (fnCall) {
+        var l = [];
+        for (var i = 0; i < Object.keys(this).length; i++) { // NB: If use forEach instead, "this" won't refer to the object!
+            var x = Object.keys(this)[i];
+            if (this.hasOwnProperty(x)) {
+                for (var j = 0; j < Object.keys(this[x]).length; j++) {
+                    var y = Object.keys(this[x])[j];
+                    if (this[x].hasOwnProperty(y)) {
+                        if (fnCall) {
+                            for (var k = 0; k < this[x][y].length; k++) {
+                                l.push(this[x][y][k][fnCall]());
+                            }
+                        } else {
+                            l = l.concat(this[x][y]);
                         }
-                    }else {
-                        l = l.concat(this[x][y]);
                     }
                 }
             }
         }
+        return l;
+    };
+
+    if (typeof window === 'undefined') {
+        module.exports.spaceMap = spaceMap;
     }
-    return l;
-};
 
-if (typeof window === 'undefined') {
-    module.exports.spaceMap = spaceMap;
-}
+    AOIutils.listAdjacentAOIs = function (current) {
+        var AOIs = [];
+        var isAtTop = (current < AOIutils.nbAOIhorizontal);
+        var isAtBottom = (current > AOIutils.lastAOIid - AOIutils.nbAOIhorizontal);
+        var isAtLeft = (current % AOIutils.nbAOIhorizontal == 0);
+        var isAtRight = (current % AOIutils.nbAOIhorizontal == AOIutils.nbAOIhorizontal - 1);
+        AOIs.push(current);
+        if (!isAtTop) AOIs.push(current - AOIutils.nbAOIhorizontal);
+        if (!isAtBottom) AOIs.push(current + AOIutils.nbAOIhorizontal);
+        if (!isAtLeft) AOIs.push(current - 1);
+        if (!isAtRight) AOIs.push(current + 1);
+        if (!isAtTop && !isAtLeft) AOIs.push(current - 1 - AOIutils.nbAOIhorizontal);
+        if (!isAtTop && !isAtRight) AOIs.push(current + 1 - AOIutils.nbAOIhorizontal);
+        if (!isAtBottom && !isAtLeft) AOIs.push(current - 1 + AOIutils.nbAOIhorizontal);
+        if (!isAtBottom && !isAtRight) AOIs.push(current + 1 + AOIutils.nbAOIhorizontal);
+        return AOIs;
+    };
 
-AOIutils.listAdjacentAOIs = function(current){
-    var AOIs = [];
-    var isAtTop = (current < AOIutils.nbAOIhorizontal);
-    var isAtBottom = (current > AOIutils.lastAOIid - AOIutils.nbAOIhorizontal);
-    var isAtLeft = (current%AOIutils.nbAOIhorizontal == 0);
-    var isAtRight = (current%AOIutils.nbAOIhorizontal == AOIutils.nbAOIhorizontal-1);
-    AOIs.push(current);
-    if(!isAtTop) AOIs.push(current - AOIutils.nbAOIhorizontal);
-    if(!isAtBottom) AOIs.push(current + AOIutils.nbAOIhorizontal);
-    if(!isAtLeft) AOIs.push(current-1);
-    if(!isAtRight) AOIs.push(current+1);
-    if(!isAtTop && !isAtLeft) AOIs.push(current-1-AOIutils.nbAOIhorizontal);
-    if(!isAtTop && !isAtRight) AOIs.push(current+1-AOIutils.nbAOIhorizontal);
-    if(!isAtBottom && !isAtLeft) AOIs.push(current-1+AOIutils.nbAOIhorizontal);
-    if(!isAtBottom && !isAtRight) AOIs.push(current+1+AOIutils.nbAOIhorizontal);
-    return AOIs;
-};
-
-if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
+    if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
 
 
     /**
@@ -178,10 +190,10 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
     // Being is the topmost class encompassing all "living" sprites, be it players, NPC or monsters (not items)
     function Being(x, y, key) {
         // key is the string indicating which atlas to use
-        window.Phaser.Sprite.call(this, this, x, y, key); // Call to constructor of parent
+        // window.Phaser.Sprite.call(this, game, x, y, key); // Call to constructor of parent
         this.speed = 0;
         this.destination = null;
-        this.add.existing(this);
+        // this.add.existing(this);
     }
     Being.prototype = Object.create(window.Phaser.Sprite.prototype); // Declares the inheritance relationship
     Being.prototype.constructor = Being;
@@ -657,24 +669,24 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
      * Created by Jerome on 25-02-17.
      */
 
-    function NPC(x, y, key) {
-        // key is a string use as a key in this.npcInfo to fetch the necessary information about the NPC to create
-        Human.call(this, x, y, 'atlas1');
-        this.rate = 2; // animation rate
-        this.absorbProperties(this.npcInfo[key]);
-        if (this.customAnchor) {
-            this.anchor.set(this.customAnchor.x, this.customAnchor.y);
-        } else {
-            this.anchor.set(0, 0.25);
-        }
-        this.addChild(this.add.sprite(0, 4, 'atlas1', 'shadow'));
-        this.setHoverCursors(this, this.talkCursor);
-        var tile = this.computeTileCoords(this.x, this.y);
-        this.collisionArray[tile.y][tile.x] = 1; // So that you have to walk around NPC
-        this.events.onInputUp.add(this.handleCharClick, this);
-    }
-    NPC.prototype = Object.create(Human.prototype);
-    NPC.prototype.constructor = NPC;
+    // function NPC(x, y, key) {
+    //     // key is a string use as a key in this.npcInfo to fetch the necessary information about the NPC to create
+    //     Human.call(this, x, y, 'atlas1');
+    //     this.rate = 2; // animation rate
+    //     // this.absorbProperties(this.npcInfo[key]);
+    //     if (this.customAnchor) {
+    //         this.anchor.set(this.customAnchor.x, this.customAnchor.y);
+    //     } else {
+    //         // this.anchor.set(0, 0.25);
+    //     }
+    //     this.addChild(this.add.sprite(0, 4, 'atlas1', 'shadow'));
+    //     this.setHoverCursors(this, this.talkCursor);
+    //     var tile = this.computeTileCoords(this.x, this.y);
+    //     this.collisionArray[tile.y][tile.x] = 1; // So that you have to walk around NPC
+    //     this.events.onInputUp.add(this.handleCharClick, this);
+    // }
+    // NPC.prototype = Object.create(Human.prototype);
+    // NPC.prototype.constructor = NPC;
 
     /**
  * Created by Jerome on 25-02-17.
@@ -981,10 +993,10 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
         },
         create: function () {
             socket = io();
-
+            var onevent = socket.onevent;
             testKey = this.input.keyboard.addKey(window.Phaser.Keyboard.ENTER);
-            testKey.onDown.add(Client.sendTest, this);
-            map = this.add.tilemap('map');
+            testKey.onDown.add(this.sendTest, this);
+            map = this.add.tilemap('map', null, 32, 32, 980, 500);
             map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
 
             for (var i = 0; i < map.layers.length; i++) {
@@ -999,26 +1011,26 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
 
             // A few maps mapping the name of an element (a monster, npc, item...) to its properties
             // Put before other functions, which might need it
-            this.itemsInfo = this.db.items;
-            this.npcInfo = this.db.npc;
-            this.monstersInfo = this.db.monsters;
-            this.findLocationAchievements(); // Scan the list of location-based achievements and store them somewhere
+            // this.itemsInfo = this.db.items;
+            // this.npcInfo = this.db.npc;
+            // this.monstersInfo = this.db.monsters;
+            // this.findLocationAchievements(); // Scan the list of location-based achievements and store them somewhere
 
             // A few maps mapping numerical id's to string keys
             this.itemsIDmap = {};
             this.monstersIDmap = {};
-            this.makeIDmap(this.itemsInfo, this.itemsIDmap);
-            this.makeIDmap(this.monstersInfo, this.monstersIDmap);
+            // this.makeIDmap(this.itemsInfo, this.itemsIDmap);
+            // this.makeIDmap(this.monstersInfo, this.monstersIDmap);
             this.entities = this.add.group(); // Group containing all the objects appearing on the map (npc, monster, items, players ...)
             this.scenery = this.add.group(); // Group containing all the animated sprites generated from the map
 
             this.displayMap(); // Reads the Tiled JSON to generate the map, manage layers, create collision array for the pathfinding and make a dictionary of teleports
             //this.displayScenery(); // Finds all "scenery" tiles in the map and replace them by animated sprites
-            this.displayNPC(); // Read the Tiled JSON and display the NPC
+            // this.displayNPC(); // Read the Tiled JSON and display the NPC
 
             this.createMarker(); // Creates the marker following the pointer that highlight tiles
             this.makeHPtexts(); // Creates a pool of text elements to use to display HP
-            this.addSounds(); // Add the sounds of the this to some global object
+            // this.addSounds(); // Add the sounds of the this to some global object
 
             // Factories used to fetch unused sprites before creating new ones (or creating new ones when no other available)
 
@@ -1033,9 +1045,9 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
                 return new Monster(x, y, key);
             });
 
-            Client.requestData();
+            this.requestData();
 
-            Client.askNewPlayer();
+            this.askNewPlayer();
 
             socket.on('newplayer', function (data) {
                 this.addNewPlayer(data.id, data.x, data.y);
@@ -1045,17 +1057,16 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
                     this.addNewPlayer(data[i].id, data[i].x, data[i].y);
                 }
 
-                Client.socket.on('move', function (data) {
+                socket.on('move', function (data) {
                     this.movePlayer(data.id, data.x, data.y);
                 });
-
-                Client.socket.on('remove', function (id) {
+                socket.on('remove', function (id) {
                     this.removePlayer(id);
                 });
             });
         },
         getCoordinates: function (layer, pointer) {
-            Client.sendClick(pointer.worldX, pointer.worldY);
+            this.sendClick(pointer.worldX, pointer.worldY);
         },
         addNewPlayer: function (id, x, y) {
             playerMap[id] = this.add.sprite(x, y, 'sprite');
@@ -1077,15 +1088,15 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
 
         sendTest: function () {
             console.log("test sent");
-            Client.socket.emit('test');
+            socket.emit('test');
         },
 
         askNewPlayer: function () {
-            Client.socket.emit('newplayer');
+            socket.emit('newplayer');
         },
 
         sendClick: function (x, y) {
-            Client.socket.emit('click', { x: x, y: y });
+            socket.emit('click', { x: x, y: y });
         },
         // Main update function; processes the global update packages received from the server
         updateWorld: function (data) { // data is the update package from the server
@@ -1615,16 +1626,16 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
             this.loadingShade.drawRect(this.borderPadding, this.borderPadding, this.stage.width - (this.borderPadding * 2), this.stage.height - (this.borderPadding * 2));
             this.loadingShade.endFill();
             // Add some loading text (whos value is in this.db.texts) and center it
-            this.loadingText = this.add.text(0, 0, this.db.texts.create, {
-                font: '18px pixel',
-                fill: "#ffffff", // f4d442
-                stroke: "#000000",
-                strokeThickness: 3
-            });
-            this.loadingText.x = this.width / 2 - this.loadingText.width / 2;
-            this.loadingText.y = this.height / 2 - this.loadingText.height / 2;
-            this.loadingText.style.wordWrap = true;
-            this.loadingText.style.wordWrapWidth = 400;
+            // this.loadingText = this.add.text(0, 0, this.db.texts.create, {
+            //     font: '18px pixel',
+            //     fill: "#ffffff", // f4d442
+            //     stroke: "#000000",
+            //     strokeThickness: 3
+            // });
+            // this.loadingText.x = this.width / 2 - this.loadingText.width / 2;
+            // this.loadingText.y = this.height / 2 - this.loadingText.height / 2;
+            // this.loadingText.style.wordWrap = true;
+            // this.loadingText.style.wordWrapWidth = 400;
         },
 
         // Displays the screen used to prompt the player to change the orientation of his device;
@@ -1770,19 +1781,19 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
             this.updateAchievements();
         },
 
-        findLocationAchievements: function () {
-            this.locationAchievements = [];
-            Object.keys(this.db.achievements).forEach(function (achID) {
-                if (Client.hasAchievement(achID)) return;
-                var ach = this.db.achievements[achID];
-                if (ach.locationAchievement) {
-                    var area = new window.Phaser.Rectangle(ach.rect.x, ach.rect.y, ach.rect.w, ach.rect.h);
-                    area.criterion = ach.criterion;
-                    area.achID = achID;
-                    this.locationAchievements.push(area);
-                }
-            });
-        },
+        // findLocationAchievements: function () {
+        //     this.locationAchievements = [];
+        //     Object.keys(this.db.achievements).forEach(function (achID) {
+        //         if (Client.hasAchievement(achID)) return;
+        //         var ach = this.db.achievements[achID];
+        //         if (ach.locationAchievement) {
+        //             var area = new window.Phaser.Rectangle(ach.rect.x, ach.rect.y, ach.rect.w, ach.rect.h);
+        //             area.criterion = ach.criterion;
+        //             area.achID = achID;
+        //             this.locationAchievements.push(area);
+        //         }
+        //     });
+        // },
 
         // =======================
         // POS CODE : Code for position and camera-related computations
@@ -1896,16 +1907,16 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
 
         // =============
         // Sounds-related code
-        addSounds: function () {
-            // Slices the audio sprite based on the markers positions fetched from the JSON
-            var markers = this.db.sounds;
-            this.sounds = this.add.audio('sounds');
-            this.sounds.allowMultiple = true;
-            Object.keys(markers.spritemap).forEach(function (sound) {
-                var sfx = markers.spritemap[sound];
-                this.sounds.addMarker(sound, sfx.start, sfx.end - sfx.start);
-            });
-        },
+        // addSounds: function () {
+        //     // Slices the audio sprite based on the markers positions fetched from the JSON
+        //     var markers = this.db.sounds;
+        //     this.sounds = this.add.audio('sounds');
+        //     this.sounds.allowMultiple = true;
+        //     Object.keys(markers.spritemap).forEach(function (sound) {
+        //         var sfx = markers.spritemap[sound];
+        //         this.sounds.addMarker(sound, sfx.start, sfx.end - sfx.start);
+        //     });
+        // },
 
         //===================
         // Animations-related code
@@ -2079,7 +2090,7 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
             this.marker.alpha = 0.5;
             this.marker.canSee = true;
             this.marker.collide = false;
-            this.canvas.style.cursor = this.cursor;
+            // this.canvas.style.cursor = this.cursor;
         },
 
         updateMarker: function (x, y, collide) { // Makes the marker white or red depending on whether the underlying tile is collidable
@@ -2210,8 +2221,8 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
                 this.collisionArray.push(col);
             }
 
-            this.easystar.setGrid(this.collisionArray);
-            this.easystar.setAcceptableTiles([0]);
+        //    EasyStar.setGrid(this.collisionArray);
+        //    EasyStar.setAcceptableTiles([0]);
         },
 
         createDoorsMap: function () { // Create the associative array mapping coordinates to doors/teleports
@@ -2251,15 +2262,15 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
             this.scenery.forEach(this.basicAnimation, this);
         },
 
-        displayNPC: function () {
-            var entities = this.cache.getJSON('entities'); // mapping from object IDs to sprites, the sprites being keys for the appropriate json file
-            for (var e = 0; e < this.map.objects.entities.length; e++) {
-                var object = this.map.objects.entities[e];
-                if (!entities.hasOwnProperty(object.gid - 1961)) continue; // 1961 is the starting ID of the npc tiles in the map ; this follows from how the map was made in the original BrowserQuest
-                var entityInfo = entities[object.gid - 1961];
-                if (entityInfo.npc) this.basicAtlasAnimation(this.entities.add(new NPC(object.x, object.y, entityInfo.sprite)));
-            }
-        },
+        // displayNPC: function () {
+        //     var entities = this.cache.getJSON('entities'); // mapping from object IDs to sprites, the sprites being keys for the appropriate json file
+        //     for (var e = 0; e < this.map.objects.entities.length; e++) {
+        //         var object = this.map.objects.entities[e];
+        //         if (!entities.hasOwnProperty(object.gid - 1961)) continue; // 1961 is the starting ID of the npc tiles in the map ; this follows from how the map was made in the original BrowserQuest
+        //         var entityInfo = entities[object.gid - 1961];
+        //         if (entityInfo.npc) this.basicAtlasAnimation(this.entities.add(new NPC(object.x, object.y, entityInfo.sprite)));
+        //     }
+        // },
 
         // ===========================
         // Mouse and click-related code
@@ -2404,12 +2415,12 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
         makeHPtexts: function () { // Create a pool of HP texts to (re)use when needed during the this
             HPGroup = this.add.group();
             for (var b = 0; b < 60; b++) {
-                this.HPGroup.add(this.add.text(0, 0, '', {
+                HPGroup.add(this.add.text(0, 0, '', {
                     font: '20px pixel',
                     strokeThickness: 2
                 }));
             }
-            this.HPGroup.setAll('exists', false);
+           HPGroup.setAll('exists', false);
         },
 
         displayHP: function (txt, color, target, delay) { // Display hit points above a sprite
@@ -2460,6 +2471,143 @@ if (typeof window === 'undefined') module.exports.AOIutils = AOIutils;
             txt.maxWidth = 200;
             txt.alpha = 1.5;
             return bubble;
+        },
+        //
+        // client code or whatever
+        emptyQueue: function () { // Process the events that have been queued during initialization
+            for (var e = 0; e < Client.eventsQueue.length; e++) {
+                onevent.call(Client.socket, Client.eventsQueue[e]);
+            }
+        },
+
+        requestData: function () { // request the data to be used for initWorld()
+            socket.emit('init-world', this.getInitRequest());
+        },
+
+        getInitRequest: function () { // Returns the data object to send to request the initialization data
+            // In case of a new player, set new to true and send the name of the player
+            // Else, set new to false and send it's id instead to fetch the corresponding data in the database
+            if (this.isNewPlayer()) return { new: true, name: this.getName(), clientTime: Date.now() };
+            var id = this.getPlayerID();
+            return { new: false, id: id, clientTime: Date.now() };
+        },
+
+        isNewPlayer: function () {
+            var id = this.getPlayerID();
+            var name = this.getName();
+            var armor = this.getArmor();
+            var weapon = this.getWeapon();
+            return !(id !== undefined && name && armor && weapon);
+        },
+
+        setLocalData: function (id) { // store the player ID in localStorage
+            //console.log('your ID : '+id);
+            localStorage.setItem(this.storageIDKey, id);
+        },
+
+        getPlayerID: function () {
+            return localStorage.getItem(this.storageIDKey);
+        },
+
+        hasAchievement: function (id) {
+            return (localStorage.getItem('ach' + id) ? true : false);
+        },
+
+        setAchievement: function (id) {
+            localStorage.setItem('ach' + id, true);
+        },
+
+        setArmor: function (key) {
+            localStorage.setItem('armor', key);
+        },
+
+        getArmor: function () {
+            return localStorage.getItem('armor');
+        },
+
+        setWeapon: function (key) {
+            localStorage.setItem('weapon', key);
+        },
+
+        getWeapon: function () {
+            return localStorage.getItem('weapon');
+        },
+
+        getName: function (name) {
+            localStorage.setItem('name', name);
+        },
+
+        getName: function () {
+            return localStorage.getItem('name');
+        },
+
+        // Client.socket.on('pid',function(playerID){ // the 'pid' event is used for the server to tell the client what is the ID of the player
+        //     Client.setLocalData(playerID);
+        // });
+
+        // Client.socket.on(Client.initEventName,function(data){ // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
+        //     if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.initializationSchema); // if in binary format, decode first
+        //     Client.socket.emit('ponq',data.stamp); // send back a pong stamp to compute latency
+        //     Game.initWorld(data);
+        //     Game.updateNbConnected(data.nbconnected);
+        // });
+
+        // Client.socket.on('update',function(data){ // This event triggers uppon receiving an update packet (data)
+        //     if(data instanceof ArrayBuffer) data = Decoder.decode(data,CoDec.finalUpdateSchema); // if in binary format, decode first
+        //     Client.socket.emit('ponq',data.stamp);  // send back a pong stamp to compute latency
+        //     if(data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
+        //     if(data.latency) Game.setLatency(data.latency);
+        //     if(data.global) Game.updateWorld(data.global);
+        //     if(data.local) Game.updateSelf(data.local);
+        // });
+
+        // Client.socket.on('reset',function(data){
+        //     // If there is a mismatch between client and server coordinates, this event will reset the client to the server coordinates
+        //     // data contains the correct position of the player
+        //     Game.moveCharacter(Game.player.id,data,0,Game.latency);
+        // });
+
+        // Client.socket.on('dbError',function(){
+        //     // dbError is sent back from the server when the client attempted to connect by sending a player ID that has no match in the database
+        //     localStorage.clear();
+        //     Game.displayError();
+        // });
+
+        // Client.socket.on('wait',function(){
+        //     // wait is sent back from the server when the client attempts to connect before the server is done initializing and reading the map
+        //     console.log('Server not ready, re-attempting...');
+        //     setTimeout(Client.requestData, 500); // Just try again in 500ms
+        // });
+
+        // Client.socket.on('chat',function(data){
+        //     // chat is sent by the server when another nearby player has said something
+        //     Game.playerSays(data.id,data.txt);
+        // });
+
+        sendPath: function (path, action, finalOrientation) {
+            // Send the path that the player intends to travel
+            Client.socket.emit('path', {
+                path: path,
+                action: action,
+                or: finalOrientation
+            });
+        },
+
+        sendChat: function (txt) {
+            // Send the text that the player wants to say
+            if (!txt.length || txt.length > this.maxChatLength) return;
+            Client.socket.emit('chat', txt);
+        },
+
+        sendRevive: function () {
+            // Signal the server that the player wants to respawn
+            Client.socket.emit('revive');
+        },
+
+        deletePlayer: function () {
+            // Signal the server that the player wants to delete his character
+            Client.socket.emit('delete', { id: Client.getPlayerID() });
+            localStorage.clear();
         },
 
         // ================================

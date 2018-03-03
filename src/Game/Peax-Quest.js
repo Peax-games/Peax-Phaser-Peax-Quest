@@ -11,7 +11,7 @@ window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 export default function PeaxQuest() {
     var game = new window.Phaser.Game(24*32, 17*32, window.Phaser.AUTO, 'myCanvas');
-    game.stage.disableVisibilityChange = true;
+    // game.stage.disableVisibilityChange = true;
 
     game.global={
         borderPadding: 10, // size of the gray border of the game window
