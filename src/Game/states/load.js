@@ -4,6 +4,8 @@ export default function loadState(game) {
             game.load.tilemap('map', 'img/maps/minimap_client.json', null, window.Phaser.Tilemap.TILED_JSON);
             game.load.spritesheet('tileset', 'img/tilesets/tilesheet.png', 32, 32);
             game.load.atlasJSONHash('atlas4', 'img/sprites/atlas4.png', 'assets/sprites/atlas4.json'); // Atlas of monsters
+            game.load.atlas('atlas1', 'img/sprites/atlas1.png', 'img/sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
+            game.load.atlas('atlas3', 'img/sprites/atlas3.png', 'img/sprites/atlas3.json'); // Items, weapons, armors
             game.load.spritesheet('bubble', 'img/sprites/bubble2.png', 5, 5); // tilesprite used to make speech bubbles
             game.load.spritesheet('life', 'img/sprites/lifelvl.png', 5, 18); // tilesprite used to make lifebar
             // game.load.audio('sounds', 'img/audio/sounds.mp3', 'assets/audio/sounds.ogg'); // audio sprite of all sound effects

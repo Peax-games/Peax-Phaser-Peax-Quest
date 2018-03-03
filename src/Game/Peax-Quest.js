@@ -4,6 +4,7 @@ import menuState from './states/menu';
 import playState from './states/play';
 import winState from './states/win';
 import loseState from './states/lose';
+import homeState from './states/home';
 
 window.PIXI = require('phaser-ce/build/custom/pixi');
 window.p2 = require('phaser-ce/build/custom/p2');
@@ -45,6 +46,7 @@ export default function PeaxQuest() {
 
 
     game.state.add('boot', bootState);
+    game.state.add('home', homeState);
     game.state.add('load', loadState);
     game.state.add('menu', menuState);
     game.state.add('play', playState);

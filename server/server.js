@@ -33,7 +33,7 @@ var Encoder = require('./Encoder.js').Encoder;
 server.enableBinary = true;
 gs.server = server;
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/../build'));
 // app.use('/css',express.static(__dirname + '/css'));
 // app.use('/js',express.static(__dirname + '/js'));
 // app.use('/assets',express.static(__dirname + '/assets'));
