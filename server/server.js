@@ -21,7 +21,7 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
-var mongo = require('mongodb').MongoClient;
+// var mongo = require('mongodb').MongoClient;
 var quickselect = require('quickselect'); // Used to compute the median for latency
 
 var mapFormat = require('./format.js');
@@ -33,7 +33,7 @@ var Encoder = require('./Encoder.js').Encoder;
 server.enableBinary = true;
 gs.server = server;
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/../build'));
 // app.use('/css',express.static(__dirname + '/css'));
 // app.use('/js',express.static(__dirname + '/js'));
 // app.use('/assets',express.static(__dirname + '/assets'));
@@ -45,7 +45,7 @@ app.use(express.static(__dirname + '/public'));
 
 // Manage command line arguments
 var myArgs = require('optimist').argv;
-var mongoHost, mongoDBName;
+// var mongoHost, mongoDBName;
 //----------------------------------------------------------------------------------------
 function sleep(milliseconds) {
     console.log('Waiting for database - start: ' + new Date().getTime());
@@ -62,15 +62,15 @@ if(myArgs.waitForDatabase) {
     sleep(myArgs.waitForDatabase);
 }
 
-if(myArgs.heroku){ // --heroku flag to behave according to Heroku's specs
-    mongoHost = 'heroku_4tv68zls:'+myArgs.pass+'@ds141368.mlab.com:41368';
-    mongoDBName = 'heroku_4tv68zls';
-}else {
-    var mongoPort = (/*myArgs.mongoPort || */27017);
-    var mongoServer = (/*myArgs.mongoServer || */'localhost');
-    mongoHost = mongoServer+':'+mongoPort;
-    mongoDBName = 'phaserQuest';
-}
+// if(myArgs.heroku){ // --heroku flag to behave according to Heroku's specs
+//     mongoHost = 'heroku_4tv68zls:'+myArgs.pass+'@ds141368.mlab.com:41368';
+//     mongoDBName = 'heroku_4tv68zls';
+// }else {
+//     var mongoPort = (/*myArgs.mongoPort || */27017);
+//     var mongoServer = (/*myArgs.mongoServer || */'localhost');
+//     mongoHost = mongoServer+':'+mongoPort;
+//     mongoDBName = 'phaserQuest';
+// }
 
 server.listen(myArgs.p || process.env.PORT || 8081,function(){ // -p flag to specify port ; the env variable is needed for Heroku
     console.log('Listening on '+server.address().port);
@@ -78,11 +78,11 @@ server.listen(myArgs.p || process.env.PORT || 8081,function(){ // -p flag to spe
     gs.readMap();
     server.setUpdateLoop();
 
-    mongo.connect('mongodb://'+mongoHost+'/'+mongoDBName,function(err,db){
-        if(err) throw(err);
-        server.db = db;
-        console.log('Connection to db established');
-    });
+    // mongo.connect('mongodb://'+mongoHost+'/'+mongoDBName,function(err,db){
+    //     if(err) throw(err);
+    //     server.db = db;
+    //     console.log('Connection to db established');
+    // });
 });
 
 // ------------------------------------------------------------------------

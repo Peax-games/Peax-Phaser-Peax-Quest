@@ -15,7 +15,7 @@ export default function menuState(){
             this.game.state.start('howto')
         },
         play: function () {
-            this.game.state.start('play')
+            this.game.state.start('home')
         },
         createButton: function(game, string, x, y, w, h, callback){
             var button1 = game.add.button(x, y, 'button', callback, this, 1, 0, 2);

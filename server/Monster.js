@@ -13,22 +13,22 @@ function Monster(x,y,monster){
     this.startX = x;
     this.startY = y;
     this.category = 'monster';
-    var info = GameServer.db.monsters[monster];
-    if(info === undefined){
-        console.error('WARNING : undefined data for monster : '+monster);
-        return;
-    }
-    this.lootTable = GameServer.formatLootTable(info.lootTable);
-    this.monster = info.id; // the id of the monster (rat, ...) (int)
-    this.aggro = info.aggressive;
-    if(this.aggro === undefined) this.aggro = true;
-    this.maxLife = info.life;
-    this.life = this.maxLife;
-    this.speed = info.speed;
-    this.atk = info.atk;
-    this.def = info.def;
-    this.name = info.name;
-    this.lastPositionCheck = Date.now();
+    // var info = GameServer.db.monsters[monster];
+    // if(info === undefined){
+    //     console.error('WARNING : undefined data for monster : '+monster);
+    //     return;
+    // }
+    // this.lootTable = GameServer.formatLootTable(info.lootTable);
+    // this.monster = info.id; // the id of the monster (rat, ...) (int)
+    // this.aggro = info.aggressive;
+//     if(this.aggro === undefined) this.aggro = true;
+//     this.maxLife = info.life;
+//     this.life = this.maxLife;
+//     this.speed = info.speed;
+//     this.atk = info.atk;
+//     this.def = info.def;
+//     this.name = info.name;
+//     this.lastPositionCheck = Date.now();
 }
 
 Monster.prototype = Object.create(MovingEntity.prototype); // Declares the inheritance relationship
