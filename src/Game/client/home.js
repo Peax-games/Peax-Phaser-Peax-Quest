@@ -1,3 +1,4 @@
+var Game = require('./game');
 /**
  * Created by Jerome on 09-02-17.
  */
