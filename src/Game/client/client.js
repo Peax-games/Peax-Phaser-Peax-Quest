@@ -31,7 +31,7 @@ Client.socket.onevent = function (packet) {
     }
 };
 
-Client.prototype.emptyQueue = function () { // Process the events that have been queued during initialization
+Client.emptyQueue = function () { // Process the events that have been queued during initialization
     for (var e = 0; e < Client.eventsQueue.length; e++) {
         onevent.call(Client.socket, Client.eventsQueue[e]);
     }

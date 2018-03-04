@@ -72,8 +72,12 @@ export default function GameState(game) {
     };
     var db;
     var HUD;
+    var something
 
     return {
+        init: function(data){
+            something= data.something;
+        },
         create: function (game) {
             db = game.cache.getJSON('db');
             HUD = this.add.group(); // Group containing all objects involved in the HUD
@@ -99,8 +103,8 @@ export default function GameState(game) {
             // this.displayScenery(); // Finds all "scenery" tiles in the map and replace them by animated sprites
             // this.displayNPC(); // Read the Tiled JSON and display the NPC
 
-            this.createMarker(); // Creates the marker following the pointer that highlight tiles
-            this.makeHPtexts(); // Creates a pool of text elements to use to display HP
+            // this.createMarker(); // Creates the marker following the pointer that highlight tiles
+            // this.makeHPtexts(); // Creates a pool of text elements to use to display HP
             // this.addSounds(); // Add the sounds of the this to some global object
 
             // Factories used to fecth unused sprites before creating new ones (or creating new ones when no other available)
@@ -114,7 +118,7 @@ export default function GameState(game) {
                 return new Monster(game, x, y, key);
             });
 
-            // Client.requestData();
+            something.requestData();
         },
 
         // Main update function; processes the global update packages received from the server
@@ -1188,9 +1192,9 @@ export default function GameState(game) {
         // MAP CODE : Map & NPC-related code
 
         displayMap: function () {
-            this.groundMapLayers = this.add.group();
-            this.highMapLayers = this.add.group();
-            this.map = this.add.tilemap('map');
+            this.groundMapLayers = game.add.group();
+            this.highMapLayers = game.add.group();
+            this.map = game.add.tilemap('map');
             this.map.addTilesetImage('tilesheet', 'tileset');
             this.map.thisLayers = [];
             for (var i = 0; i < this.map.layers.length; i++) {
@@ -1203,7 +1207,7 @@ export default function GameState(game) {
             // this.createDoorsMap(); // Create the associative array mapping coordinates to doors/teleports
 
             //this.world.resize(this.map.widthInPixels,this.map.heightInPixels);
-            this.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+            game.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
             this.map.tileset = {
                 gid: 1,
