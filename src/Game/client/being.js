@@ -29,12 +29,12 @@ var orientationsDict = {
 
 // Being is the topmost class encompassing all "living" sprites, be it players, NPC or monsters (not items)
 export default class Being {
-    constructor( game, x, y, key) {
+    constructor(game, x, y, key) {
         // key is the string indicating which atlas to use
         window.Phaser.Sprite.call(this, game, x, y, key); // Call to constructor of parent
         this.speed = 0;
         this.destination = null;
-        game.add.existing(this);
+        this.game.add.existing(this);
     }
 };
 Being.prototype = Object.create(window.Phaser.Sprite.prototype); // Declares the inheritance relationship
@@ -159,7 +159,7 @@ Being.prototype.pathfindingCallback = function (finalOrientation, action, delta,
     // delta is some value based on latency, that will slightly adjust the speed of the movement to compensate for the latency
     // sendToServer is a boolean indicating if the computed path should be sent to the server (because it's the path that the player wants to follow)
     // path is an array of 2-tuples of coordinates
-    if (path === null && this.isPlayer) {
+    if (path == null && this.isPlayer) {
         Game.moveTarget.visible = false;
         Game.marker.visible = true;
     } else if (path !== null) {

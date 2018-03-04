@@ -118,7 +118,7 @@ homeState.prototype.makehomeStateScroll = function(){
     var buttonY;
     var player;
     if(Game.isNewPlayer){
-        player = homeState.scroll.addChild(this.game.add.sprite(0, 110, 'atlas3', 'clotharmor_31'));
+        player = homeState.scroll.addChild(myself.game.add.sprite(0, 110, 'atlas3', 'clotharmor_31'));
         player.alpha = 0.5;
         // homeState.inputField = homeState.scroll.addChild(this.game.add.inputField(185, 160,{
         //     width: 300,
@@ -139,9 +139,9 @@ homeState.prototype.makehomeStateScroll = function(){
         // homeState.inputField.input.useHandCursor = false;
         buttonY = 220;
     }else {
-        player = homeState.scroll.addChild(this.game.add.sprite(0, 100, 'atlas3', Client.getArmor()+'_31'));
+        player = homeState.scroll.addChild(myself.game.add.sprite(0, 100, 'atlas3', Client.getArmor()+'_31'));
         var wpn = Client.getWeapon();
-        var weapon = player.addChild(this.game.add.sprite(0, 0, 'atlas3', wpn+'_31'));
+        var weapon = player.addChild(myself.game.add.sprite(0, 0, 'atlas3', wpn+'_31'));
         weapon.position.set(Game.db.items[wpn].offsets.x, Game.db.items[wpn].offsets.y);
         var name = player.addChild(this.game.add.text(0,42, Client.getName(), {
             font: '18px pixel',
@@ -155,8 +155,8 @@ homeState.prototype.makehomeStateScroll = function(){
     }
     player.addChild(this.game.add.sprite(0,5, 'atlas1','shadow'));
     player.anchor.set(0.25,0.35);
-    homeState.button = this.makeButton(homeState.scroll,buttonY,'play',this.startGame);
-    if(!Game.isNewPlayer) this.disableButton();
+    homeState.button = homeState.makeButton(homeState.scroll,buttonY,'play',this.startGame);
+    if(!Game.isNewPlayer) homeState.disableButton();
     player.x = homeState.button.x - 18;
 };
 
@@ -174,15 +174,15 @@ homeState.makeTitle = function(scroll,txt){
     scroll.addChild(myself.game.add.sprite(title.x + 105,titleY-12,'atlas1','stache_1'));
 };
 
-homeState.prototype.makeButton = function(scroll,buttonY,frame,callback){
-    var button = scroll.addChild(this.game.add.button(210,buttonY, 'atlas1',callback, this, frame+'_0', frame+'_0', frame+'_1'));
+homeState.makeButton = function(scroll,buttonY,frame,callback){
+    var button = scroll.addChild(myself.game.add.button(210,buttonY, 'atlas1',callback, this, frame+'_0', frame+'_0', frame+'_1'));
     button.x = scroll.width/2;
     button.anchor.set(0.5,0);
     button.input.useHandCursor = false;
     return button;
 };
 
-homeState.prototype.makeScrollLink = function(scroll,text,callback){
+homeState.makeScrollLink = function(scroll,text,callback){
     var link = scroll.addChild(this.game.add.text(0,310,text,{
         font: '16px pixel',
         fill: "#fff",
@@ -202,14 +202,14 @@ homeState.prototype.makeScrollLink = function(scroll,text,callback){
 };
 
 
-homeState.prototype.displayResetScroll = function(){
+homeState.displayResetScroll = function(){
     if(!homeState.resetScroll) homeState.makeResetScroll();
     homeState.scroll.hideTween.start();
     homeState.resetScroll.visible = true;
     homeState.resetScroll.showTween.start();
 };
 
-homeState.prototype.makeResetScroll = function(){
+homeState.makeResetScroll = function(){
     homeState.resetScroll = homeState.makeScroll();
     homeState.setFadeTweens(homeState.resetScroll);
     homeState.makeTitle(homeState.resetScroll,'Reset your character?');
@@ -223,7 +223,7 @@ homeState.prototype.makeResetScroll = function(){
     homeState.makeScrollLink(homeState.resetScroll,'Cancel',homeState.displayhomeStateScroll);
 };
 
-homeState.prototype.deletePlayer = function(){
+homeState.deletePlayer = function(){
     Client.deletePlayer();
     homeState.scroll.destroy();
     homeState.scroll = null;
@@ -246,8 +246,8 @@ homeState.prototype.startGame = function(){
     if(ok) {
         document.onkeydown = null;
         homeState.scroll.hideTween.onComplete.add(function(){
-            this.game.state.start('game');
-        },this);
+            myself.game.state.start('game');
+        },myself);
         homeState.scroll.hideTween.start();
         homeState.logo.hideTween.start();
     }

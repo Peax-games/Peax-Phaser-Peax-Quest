@@ -6,9 +6,9 @@ import Game from '../states/game';
  */
 
 export default class NPC {
-    constructor(x, y, key) {
+    constructor(game, x, y, key) {
         // key is a string use as a key in Game.npcInfo to fetch the necessary information about the NPC to create
-        Human.call(this, x, y, 'atlas1');
+        Human.call(this, game, x, y, 'atlas1');
         this.rate = 2; // animation rate
         this.absorbProperties(Game.npcInfo[key]);
         if (this.customAnchor) {

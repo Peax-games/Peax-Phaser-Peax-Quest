@@ -106,9 +106,10 @@ var itemFactory;
 var itemsTable;
 var monstersTable;
 var displayedPlayers;
-var playerIsInitialized;
 
 var player;
+
+var collisionArray;
 
 Game.prototype.init = function () {
     // this.easystar = new EasyStar.js();
@@ -152,19 +153,19 @@ Game.prototype.create = function () {
     monstersIDmap = {};
     Game.makeIDmap(itemsInfo, itemsIDmap);
     Game.makeIDmap(monstersInfo, monstersIDmap);
-    entities = this.game.add.group(); // Group containing all the objects appearing on the map (npc, monster, items, players ...)
-    scenery = this.game.add.group(); // Group containing all the animated sprites generated from the map
+    entities = myself.game.add.group(); // Group containing all the objects appearing on the map (npc, monster, items, players ...)
+    scenery = myself.game.add.group(); // Group containing all the animated sprites generated from the map
 
     Game.displayMap(); // Reads the Tiled JSON to generate the map, manage layers, create collision array for the pathfinding and make a dictionary of teleports
     // Game.displayScenery(); // Finds all "scenery" tiles in the map and replace them by animated sprites
-    // this.displayNPC(); // Read the Tiled JSON and display the NPC
+    // Game.displayNPC(); // Read the Tiled JSON and display the NPC
 
     Game.createMarker(); // Creates the marker following the pointer that highlight tiles
     Game.makeHPtexts(); // Creates a pool of text elements to use to display HP
     // this.addSounds(); // Add the sounds of the this.game to some global object
 
     // Factories used to fecth unused sprites before creating new ones (or creating new ones when no other available)
-    playerFactory = new Factory(function (game, x, y, key) {
+    playerFactory = new Factory(function (x, y, key) {
         return new Player(myself.game, x, y, key);
     });
     itemFactory = new Factory(function (game, x, y, key) {
@@ -181,24 +182,24 @@ Game.prototype.create = function () {
 Game.updateWorld = function (data) { // data is the update package from the server
     var createdPlayers = [];
     if (data.newplayers) {
-        for (var n = 0; n < data.newplayers.length; n++) {
+        for (var n = 0; n < data.newplayers.length; n+=1) {
             Game.createPlayer(data.newplayers[n]);
             createdPlayers.push(data.newplayers[n].id);
         }
-        if (data.newplayers.length > 0) this.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
+        if (data.newplayers.length > 0) Game.sortEntities(); // Sort entitites according to y coordinate to make them render properly above each other
     }
 
     // Create new monsters and items and store them in the appropriate maps
     if (data.newitems) Game.populateTable(itemsTable, data.newitems, Game.createItem);
     if (data.newmonsters) {
-        Game.populateTable(this.monstersTable, data.newmonsters, this.createMonster);
+        Game.populateTable(monstersTable, data.newmonsters, Game.createMonster);
         Game.sortEntities();
     }
 
     for (var n = 0; n < createdPlayers.length; n++) {
         player = charactersPool[createdPlayers[n]];
         if (player.inFight) {
-            player.target = this.monstersTable[player.targetID]; // ultimately, target is object, not ID
+            player.target = monstersTable[player.targetID]; // ultimately, target is object, not ID
             player.fight();
         }
     }
@@ -212,13 +213,13 @@ Game.updateWorld = function (data) { // data is the update package from the serv
     // data.items, data.players and data.monsters are associative arrays mapping the id's of the entities
     // to small object indicating which properties need to be updated. The following code iterate over
     // these objects and call the relevant update functions.
-    if (data.items) this.traverseUpdateObject(data.items, itemsTable, this.updateItem);
+    if (data.items) Game.traverseUpdateObject(data.items, itemsTable, this.updateItem);
     // "Status" updates ; used to update some properties that need to be set before taking any real action on the this.game objects
-    if (data.players) this.traverseUpdateObject(data.players, charactersPool, this.updatePlayerStatus);
-    if (data.monsters) this.traverseUpdateObject(data.monsters, this.monstersTable, this.updateMonsterStatus);
+    if (data.players) Game.traverseUpdateObject(data.players, charactersPool, this.updatePlayerStatus);
+    if (data.monsters) Game.traverseUpdateObject(data.monsters, monstersTable, this.updateMonsterStatus);
     // "Action" updates
-    if (data.players) this.traverseUpdateObject(data.players, charactersPool, this.updatePlayerAction);
-    if (data.monsters) this.traverseUpdateObject(data.monsters, this.monstersTable, this.updateMonsterAction);
+    if (data.players) Game.traverseUpdateObject(data.players, charactersPool, this.updatePlayerAction);
+    if (data.monsters) Game.traverseUpdateObject(data.monsters, monstersTable, this.updateMonsterAction);
 };
 // For each element in arr, call the callback on it and store the result in the map 'table'
 Game.populateTable = function (table, arr, callback) {
@@ -226,7 +227,6 @@ Game.populateTable = function (table, arr, callback) {
         var data = arr[i];
         // The callback receives the object received from the server as an argument, uses the relevant factory to create
         // the proper sprite, and returns that sprite
-        console.log(callback)
         var object = callback(data);
         object.id = data.id;
         table[data.id] = object;
@@ -243,13 +243,13 @@ Game.traverseUpdateObject = function (obj, table, callback) {
 // These functions are supposed to return a sprite, whether by creating one from scratch, recycling and old one or
 // fetching the appropriate already existing one, based on the info in the 'data' packer from the server
 Game.createMonster = function (data) { // data contains the data from the server on the new entity to create
-    var monster = (this.monstersTable[data.id] ?
-        this.monstersTable[data.id] :
-        this.monsterFactory.next(data.x * this.map.tileWidth, data.y * this.map.tileHeight, 'atlas4')
+    var monster = (monstersTable[data.id] ?
+        monstersTable[data.id] :
+        monsterFactory.next(data.x * map.tileWidth, data.y * map.tileHeight, 'atlas4')
     );
-    monster.setUp(this.monstersIDmap[data.monster]);
-    this.updateMonsterStatus(monster, data);
-    this.updateMonsterAction(monster, data);
+    monster.setUp(monstersIDmap[data.monster]);
+    Game.updateMonsterStatus(monster, data);
+    Game.updateMonsterAction(monster, data);
     return monster;
 };
 
@@ -258,7 +258,7 @@ Game.createItem = function (data) { // data contains the data from the server on
     if (itemsTable[data.id]) {
         item = itemsTable[data.id]
     } else {
-        item = itemFactory.next(data.x * this.map.tileWidth, data.y * this.map.tileHeight, 'atlas3');
+        item = itemFactory.next(myself.game, data.x * map.tileWidth, data.y * map.tileHeight, 'atlas3');
         item.setUp(itemsIDmap[data.itemID], data.chest, data.inChest, data.visible, data.respawn, data.loot);
     }
     Game.updateItem(item, data);
@@ -266,11 +266,12 @@ Game.createItem = function (data) { // data contains the data from the server on
 };
 
 Game.createPlayer = function (data) { // data contains the data from the server on the new entity to create
-
+var player;
+    console.log(data)
     if (charactersPool[data.id]) {
         player = charactersPool[data.id];
     } else {
-        player = Game.newPlayer(data.x, data.y, data.id);
+        player = Game.newPlayer(myself.game, data.x, data.y, data.id);
     }
     if (!data.alive) player.visible = false;
     Game.setUpPlayer(player, data);
@@ -278,15 +279,14 @@ Game.createPlayer = function (data) { // data contains the data from the server 
     Game.updatePlayerAction(player, data);
     Game.displayedPlayers.add(player.id);
 };
-Game.newPlayer = function (x, y, id) {
-    player = playerFactory.next(x * map.tileWidth, y * map.tileHeight, 'atlas3');
+Game.newPlayer = function (game, x, y, id) {
+    player = playerFactory.next(myself.game, x * map.tileWidth, y * map.tileHeight, 'atlas3');
     player.orientation = defaultOrientation;
     player.id = id;
     entities.add(player);
     charactersPool[id] = player;
     Game.sortEntities();
     return player;
-    return;
 };
 
 Game.setUpPlayer = function (player, data) { // data contains the data from the server on the new entity to create
@@ -462,8 +462,10 @@ Game.initWorld = function (data) { // Initialize the this.game world based on th
    
     AOIutils.nbAOIhorizontal = data.nbAOIhorizontal;
     AOIutils.lastAOIid = data.lastAOIid;
+  
+
     Game.displayHero(data.player.x, data.player.y, data.player.id);
-    // Game.displayHero(200,200);
+
     Game.displayHUD(); // Displays HUD, and sets up life bar, chat bar, the HUD buttons and their behavior
 
     Game.setUpPlayer(player,data.player);
@@ -499,13 +501,13 @@ Game.initWorld = function (data) { // Initialize the this.game world based on th
     Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
     groundMapLayers.setAll('visible', true);
     highMapLayers.setAll('visible', true);
-    //this.scenery.setAll('visible',true);
+    scenery.setAll('visible',true);
     // Destroy loading screen
     // myself.loadingShade.destroy();
     // myself.loadingText.destroy();
-    Game.messageIn((this.isNewPlayer ? 'Welcome to window.PhaserQuest!' : 'Welcome back!'));
+    Game.messageIn((Game.isNewPlayer ? 'Welcome to window.PhaserQuest!' : 'Welcome back!'));
 
-    if (this.isNewPlayer) Game.toggleHelp();
+    if (Game.isNewPlayer) Game.toggleHelp();
 };
 
 Game.moveGroupTo = function (parent, group, endPos) {
@@ -529,7 +531,7 @@ Game.moveGroupTo = function (parent, group, endPos) {
 };
 
 Game.displayHero = function (x, y, id) {
-    player = Game.newPlayer(x, y, id);
+    player = Game.newPlayer(myself.game, x, y, id);
     player.setIsPlayer(true);
     player.addChild(cameraFocus = myself.game.add.sprite(0, 16)); // trick to force camera offset
     Game.followPlayer();
@@ -664,7 +666,7 @@ Game.makeHelpScroll = function () { // Make the screen showing how to play instr
     this.helpScroll.addChild(myself.game.add.text(100, charY - 10, this.db.texts.help_save, style));
 };
 
-// Create the screen used to prompt the player to change the orientation of his device
+// Create the screen used to prompt the player to change the orientation of their device
 Game.prototype.makeOrientationScreen = function () {
     this.orientationContainer = this.game.add.sprite(0, 0); // Create a container sprite
     // Make black screen to cover the scene
@@ -884,7 +886,7 @@ Game.prototype.toggleAchievements = function () { // Toggles the visibility stat
 
 // Determines if two entities (a and b) are on the same cell (returns -1), on adjacent (non-diagonal) cells (returns a value between
 // 1 and 4 corresponding to the orientation of a with respect to b) or further apart (returns 0)
-Game.prototype.adjacent = function (a, b) {
+Game.adjacent = function (a, b) {
     if (!a || !b) return 0;
     var posA = this.computeTileCoords(a.x, a.y);
     var posB = this.computeTileCoords(b.x, b.y);
@@ -913,7 +915,7 @@ Game.prototype.detectElement = function (map, x, y) {
 };
 
 // Compute the orientation that the player must have to go to the last cell of its path (used when the last cell is occupied by something and the past has to be "shortened" by one cell)
-Game.prototype.computeFinalOrientation = function (path) { // path is a list of cells
+Game.computeFinalOrientation = function (path) { // path is a list of cells
     // path is an array of 2-tuples of coordinates
     var last = path[path.length - 1];
     var beforeLast = path[path.length - 2];
@@ -940,7 +942,7 @@ Game.computeView = function () {
         myself.game.camera.width - borderPadding * 2, myself.game.camera.height - borderPadding * 2 - HUDheight);
 };
 
-Game.prototype.checkCameraBounds = function () {
+Game.checkCameraBounds = function () {
     // Due to the shape of the map, the bounds of the camera cannot always be the same; north of some Y coordinate (this.mapWideningY),
     // the width of the bounds has to increase, from 92 to 113.
     var pos = this.computeTileCoords(this.player.x, this.player.y);
@@ -1009,7 +1011,7 @@ Game.prototype.addSounds = function () {
 // Sets up basic, single-orientation animations for scenic animated sprites
 Game.basicAnimation = function (sprite) { // sprite is the sprite to which the animation should be applied
     var frames = [];
-    for (var m = 0; m < sprite.nbFrames; m++) { // Generate the list of frames of the animations based on the initial frame and the total number of frames
+    for (var m = 0; m < sprite.nbFrames; m+=1) { // Generate the list of frames of the animations based on the initial frame and the total number of frames
         frames.push(sprite.frame + m);
     }
     sprite.animations.add('idle', frames, sprite.rate, true);
@@ -1277,18 +1279,18 @@ Game.displayMap = function () {
         tileProperties: map.tilesets[0].tileProperties
     };
 
-    this.createCollisionArray();
+    Game.createCollisionArray();
 };
 
 Game.createCollisionArray = function () {
     // Create the grid used for pathfinding ; it consists in a 2D array of 0's and 1's, 1's indicating collisions
 
-    this.collisionArray = [];
-    for (var y = 0; y < map.height; y++) {
+    collisionArray = [];
+    for (var y = 0; y < map.height; y+=1) {
         var col = [];
-        for (var x = 0; x < map.width; x++) {
+        for (var x = 0; x < map.width; x+=1) {
             var collide = false;
-            for (var l = 0; l < map.gameLayers.length; l++) {
+            for (var l = 0; l < map.gameLayers.length; l+=1) {
                 var tile = map.getTile(x, y, map.gameLayers[l]);
                 if (tile) {
                     // The original BrowserQuest Tiled file doesn't use a collision layer; rather, properties are added to the
@@ -1305,7 +1307,7 @@ Game.createCollisionArray = function () {
             }
             col.push(+collide); // "+" to convert boolean to int
         }
-        this.collisionArray.push(col);
+        collisionArray.push(col);
     }
 
     // this.easystar.setGrid(this.collisionArray);
@@ -1356,7 +1358,7 @@ Game.displayNPC = function () {
         var object = map.objects.entities[e];
         if (!entities.hasOwnProperty(object.gid - 1961)) continue; // 1961 is the starting ID of the npc tiles in the map ; this follows from how the map was made in the original BrowserQuest
         var entityInfo = entities[object.gid - 1961];
-        if (entityInfo.npc) this.basicAtlasAnimation(this.entities.add(new NPC(object.x, object.y, entityInfo.sprite)));
+        if (entityInfo.npc) this.basicAtlasAnimation(entities.add(new NPC(myself.game,object.x, object.y, entityInfo.sprite)));
     }
 };
 
@@ -1589,41 +1591,41 @@ Game.sortEntities = function () { // Sort the members of the "entities" group ac
 };
 
 Game.prototype.update = function () { // Main update loop of the client
-    if (!this.playerIsInitialized) return;
-    var cell = this.computeTileCoords(myself.game.input.activePointer.worldX, myself.game.input.activePointer.worldY);
+    if (!playerIsInitialized) return;
+    var cell = Game.computeTileCoords(myself.game.input.activePointer.worldX, myself.game.input.activePointer.worldY);
     this.markerPosition.x = cell.x * map.tileWidth;
     this.markerPosition.y = cell.y * map.tileWidth;
 
-    if (this.chatInput.visible && !this.chatInput.focus) Game.toggleChat(); // Trick to make the chat react to pressing "enter"
+    // if (this.chatInput.visible && !this.chatInput.focus) Game.toggleChat(); // Trick to make the chat react to pressing "enter"
 
     if (player.hasMoved()) Game.checkCameraBounds();
 
-    if (Game.markerHasMoved()) {
-        Game.computeView();
-        this.marker.visible = (this.marker.canSee && this.view.contains(this.markerPosition.x, this.markerPosition.y));
+    // if (Game.markerHasMoved()) {
+    //     Game.computeView();
+    //     this.marker.visible = (this.marker.canSee && this.view.contains(this.markerPosition.x, this.markerPosition.y));
 
-        if (this.marker.visible) { // Check if the tile below the marker is collidable or not, and updae the marker accordingly
-            //var tiles = [];
-            var collide = false;
-            for (var l = 0; l < this.map.this.gameLayers.length; l++) {
-                var tile = this.map.getTile(cell.x, cell.y, this.map.this.gameLayers[l]);
-                if (tile) {
-                    //tiles.push(tile.index);
-                    var tileProperties = this.map.tileset.tileProperties[tile.index - this.map.tileset.gid];
-                    if (tileProperties) {
-                        if (tileProperties.hasOwnProperty('c')) {
-                            collide = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            //console.log(tiles);
+    //     if (this.marker.visible) { // Check if the tile below the marker is collidable or not, and updae the marker accordingly
+    //         //var tiles = [];
+    //         var collide = false;
+    //         for (var l = 0; l < this.map.this.gameLayers.length; l++) {
+    //             var tile = this.map.getTile(cell.x, cell.y, this.map.this.gameLayers[l]);
+    //             if (tile) {
+    //                 //tiles.push(tile.index);
+    //                 var tileProperties = this.map.tileset.tileProperties[tile.index - this.map.tileset.gid];
+    //                 if (tileProperties) {
+    //                     if (tileProperties.hasOwnProperty('c')) {
+    //                         collide = true;
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         //console.log(tiles);
 
-            this.updateMarker(this.markerPosition.x, this.markerPosition.y, collide);
-            this.previousMarkerPosition.set(this.markerPosition.x, this.markerPosition.y);
-        }
-    }
+    //         this.updateMarker(this.markerPosition.x, this.markerPosition.y, collide);
+    //         this.previousMarkerPosition.set(this.markerPosition.x, this.markerPosition.y);
+    //     }
+    // }
 };
 
 Game.prototype.render = function () { // Use to display debug information, not used in production
