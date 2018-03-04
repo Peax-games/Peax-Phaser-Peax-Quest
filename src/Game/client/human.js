@@ -5,10 +5,10 @@ import Being from './being';
  */
 
 export default class Human {
-    constructor( game,x, y, key) {
+    constructor(game, x, y, key) {
         // Child of Being, parent of NPC and Player (the common aspect being the handling of speech bubbles)
         // key is a string indicating the atlas to use as texture
-        Being.call(this, game, x, y, key);
+        Being.call(this,game, x, y, key);
     }
 }
 
@@ -35,7 +35,7 @@ Human.prototype.displayBubble = function (text) {
     txt.style.wordWrap = true;
     txt.style.wordWrapWidth = maxTextWidth;
     var width = window.Phaser.Math.clamp(txt.width, 30, maxTextWidth);
-    if (width % 2 != 0) width++; // Odd widths cause gaps in the bubbles
+    if (width % 2 != 0) width+=1; // Odd widths cause gaps in the bubbles
     var height = txt.height;
     // Compute coordinates of pieces of the speech bubble
     var ls = Game.speechBubbleCornerSize;

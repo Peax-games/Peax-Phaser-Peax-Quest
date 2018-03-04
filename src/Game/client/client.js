@@ -79,14 +79,14 @@ socket.on('chat', function (data) {
 });
 
 Client.isNewPlayer = function () {
-    var id = this.getPlayerID();
-    var name = this.getName();
-    var armor = this.getArmor();
-    var weapon = this.getWeapon();
+    var id = Client.getPlayerID();
+    var name = Client.getName();
+    var armor = Client.getArmor();
+    var weapon = Client.getWeapon();
     return !(id !== undefined && name && armor && weapon);
 };
 Client.getPlayerID = function () {
-    return localStorage.getItem(this.storageIDKey);
+    return localStorage.getItem(Client.storageIDKey);
 };
 Client.setArmor = function (key) {
     localStorage.setItem('armor', key);

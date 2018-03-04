@@ -16,9 +16,9 @@ window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 
 export default class Player {
-    constructor( game,x, y, key) {
+    constructor(game, x, y, key) {
         // key is a string indicating the atlas to use as texture
-        Human.call(this, game, x, y, key); // Send context as first argument!!
+        Human.call(this,game, x, y, key); // Send context as first argument!!
         this.anchor.set(0.25, 0.35);
         this.orientation = 4; // down
         this.speed = Game.playerSpeed;
@@ -41,9 +41,9 @@ export default class Player {
             "left": [38, 41],
             "idle_left": [42, 43]
         };
-        this.addChild(this.weapon = game.add.sprite(0, 0, 'atlas3'));
-        this.addChild(this.shadow = game.add.sprite(0, 5, 'atlas1', 'shadow'));
-        this.addChild(this.nameHolder = game.add.text(0, -30, '', {
+        this.addChild(this.weapon = this.game.add.sprite(0, 0, 'atlas3'));
+        this.addChild(this.shadow = this.game.add.sprite(0, 5, 'atlas1', 'shadow'));
+        this.addChild(this.nameHolder = this.game.add.text(0, -30, '', {
             font: '14px pixel',
             fill: "#ffffff",
             stroke: "#000000",
