@@ -6,7 +6,7 @@ export default function bootState(game){
         },
 
         create: function(){
-            game.canvas.style.cursor = this.cursor; // Sets the pointer to hand sprite
+            // game.canvas.style.cursor = this.cursor; // Sets the pointer to hand sprite
             game.state.start('load')
         }
     };

@@ -4,7 +4,7 @@
 
 // A space map is a custom data struture, similar to a sparse 2D array. Entities are stored according to their coordinates;
 // that is, two keys are needed to fetch entities, the x position and the y position. This allows fast look-up based on position.
-function spaceMap(){}
+export default class spaceMap{}
 
 spaceMap.prototype.add = function(x,y,object){
     if(!this.hasOwnProperty(x)){
@@ -91,7 +91,3 @@ spaceMap.prototype.getAll = function(fnCall){
     }
     return l;
 };
-
-if (typeof window === 'undefined') {
-    module.exports.spaceMap = spaceMap;
-}

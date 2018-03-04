@@ -1,8 +1,8 @@
 import io from 'socket.io-client';
+import Game from './game';
 
+var  CoDec =require('./CoDec');
 
-import CoDec from './CoDec';
-var Game = require('./game');
 var Decoder = ('./decoder');
 /**
  * Created by Jerome on 21-10-16.
