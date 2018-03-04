@@ -1,5 +1,5 @@
 import Being from './being';
-import Game from './game';
+import Game from '../states/game';
 
 /**
  * Created by Jerome on 25-02-17.

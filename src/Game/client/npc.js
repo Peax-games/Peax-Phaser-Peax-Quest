@@ -1,5 +1,5 @@
 import Human from './human';
-import Game from './game';
+import Game from '../states/game';
 
 /**
  * Created by Jerome on 25-02-17.

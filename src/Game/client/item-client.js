@@ -1,4 +1,4 @@
-import Game from './game';
+import Game from '../states/game';
 
 window.PIXI = require('phaser-ce/build/custom/pixi');
 window.p2 = require('phaser-ce/build/custom/p2');
