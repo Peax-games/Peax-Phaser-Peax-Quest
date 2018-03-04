@@ -36,7 +36,7 @@ var GameServer = {
 module.exports.GameServer = GameServer;
 module.exports.randomInt = randomInt;
 
-// var ObjectId = require('mongodb').ObjectID;
+var ObjectId = require('mongodb').ObjectID;
 var spaceMap = require('../spaceMap.js').spaceMap;
 var ChestArea = require('./chestarea.js').ChestArea;
 var AOIutils = require('../AOIutils.js').AOIutils;
@@ -78,13 +78,13 @@ GameServer.makeIDmap = function(collection,map){
 // Code related to reading map and setting up world
 
 GameServer.readMap = function(){
-    // GameServer.db = JSON.parse(fs.readFileSync('./assets/json/db.json').toString()); // Info about monsters, items, etc.
-    // GameServer.db.entities = JSON.parse(fs.readFileSync('./assets/json/entities_server.json').toString()); // locations of monsters, objects, chests...
-    // GameServer.db.client_entities = JSON.parse(fs.readFileSync('./assets/json/entities_client.json').toString()); // npc
-    // Object.assign(GameServer.db.entities,GameServer.db.client_entities); // merge the last two for convenience
+    GameServer.db = JSON.parse(fs.readFileSync('public/assets/json/db.json').toString()); // Info about monsters, items, etc.
+    GameServer.db.entities = JSON.parse(fs.readFileSync('public/assets/json/entities_server.json').toString()); // locations of monsters, objects, chests...
+    GameServer.db.client_entities = JSON.parse(fs.readFileSync('public/assets/json/entities_client.json').toString()); // npc
+    Object.assign(GameServer.db.entities,GameServer.db.client_entities); // merge the last two for convenience
 
-    // GameServer.db.itemsIDmap = {}; // Make a map to easily fetch string keys based on numerical id's
-    // GameServer.makeIDmap(GameServer.db.items,GameServer.db.itemsIDmap);
+    GameServer.db.itemsIDmap = {}; // Make a map to easily fetch string keys based on numerical id's
+    GameServer.makeIDmap(GameServer.db.items,GameServer.db.itemsIDmap);
 
     fs.readFile('public/assets/maps/minimap_server.json', 'utf8', function (err, data) {
         if (err) throw err;
@@ -177,17 +177,17 @@ GameServer.setUpEntities = function(){ // Set up monsters & items
     GameServer.monstersTable = {};
     for (var d = 0; d < GameServer.objects.entities.length; d++) {
         var entity = GameServer.objects.entities[d];
-        // if (!GameServer.db.entities.hasOwnProperty(entity.gid - 1961)) continue;
-        // var entityInfo = GameServer.db.entities[entity.gid - 1961];
-        // var position = GameServer.computeTileCoords(entity.x, entity.y);
-        // if (entityInfo.npc) {
-        //     GameServer.collisionGrid[position.y][position.x] = 1;
-        // if (entityInfo.item) {
-        //     var item = new Item(position.x,position.y-1,entityInfo.sprite,true,false,false); // respawn, not chest, not loot
-        //     GameServer.addAtLocation(item);
-        // } else if (entityInfo.monster) {
-        //     GameServer.addMonster(position,entityInfo.sprite);
-        // }
+        if (!GameServer.db.entities.hasOwnProperty(entity.gid - 1961)) continue;
+        var entityInfo = GameServer.db.entities[entity.gid - 1961];
+        var position = GameServer.computeTileCoords(entity.x, entity.y);
+        if (entityInfo.npc) {
+            GameServer.collisionGrid[position.y][position.x] = 1;
+        } else if (entityInfo.item) {
+            var item = new Item(position.x,position.y-1,entityInfo.sprite,true,false,false); // respawn, not chest, not loot
+            GameServer.addAtLocation(item);
+        } else if (entityInfo.monster) {
+            GameServer.addMonster(position,entityInfo.sprite);
+        }
     }
 };
 

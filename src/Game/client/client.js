@@ -3,7 +3,7 @@ import Game from './game';
 
 var CoDec = require('./CoDec');
 
-var Decoder = ('./decoder');
+var Decoder = require('./decoder');
 /**
  * Created by Jerome on 21-10-16.
  */
@@ -17,35 +17,35 @@ export default class Client {
         storageIDKey: 'playerID';// key in localStorage of player ID
     } 
 };
-Client.socket = io.connect();
-
+var socket = io();
+var clientInstance = new Client();
 // The following checks if the game is initialized or not, and based on this either queues the events or process them
 // The original socket.onevent function is copied to onevent. That way, onevent can be used to call the origianl function,
 // whereas socket.onevent can be modified for our purpose!
-var onevent = Client.socket.onevent;
-Client.socket.onevent = function (packet) {
-    if (!Game.playerIsInitialized && packet.data[0] != Client.initEventName && packet.data[0] != 'dbError') {
-        Client.eventsQueue.push(packet);
+var onevent = socket.onevent;
+socket.onevent = function (packet) {
+    if (!Game.playerIsInitialized && packet.data[0] != clientInstance.initEventName && packet.data[0] != 'dbError') {
+        clientInstance.eventsQueue.push(packet);
     } else {
         onevent.call(this, packet);    // original call
     }
 };
 
 Client.emptyQueue = function () { // Process the events that have been queued during initialization
-    for (var e = 0; e < Client.eventsQueue.length; e++) {
-        onevent.call(Client.socket, Client.eventsQueue[e]);
+    for (var e = 0; e < clientInstance.eventsQueue.length; e++) {
+        onevent.call(socket, clientInstance.eventsQueue[e]);
     }
 };
 
 Client.prototype.requestData = function () { // request the data to be used for initWorld()
-    Client.socket.emit('init-world', Client.getInitRequest());
+    socket.emit('init-world', clientInstance.getInitRequest());
 };
 
 Client.prototype.getInitRequest = function () { // Returns the data object to send to request the initialization data
     // In case of a new player, set new to true and send the name of the player
     // Else, set new to false and send it's id instead to fetch the corresponding data in the database
-    if (Client.isNewPlayer()) return { new: true, name: Client.getName(), clientTime: Date.now() };
-    var id = Client.getPlayerID();
+    if (clientInstance.isNewPlayer()) return { new: true, name: clientInstance.getName(), clientTime: Date.now() };
+    var id = clientInstance.getPlayerID();
     return { new: false, id: id, clientTime: Date.now() };
 };
 
@@ -63,7 +63,7 @@ Client.prototype.setLocalData = function (id) { // store the player ID in localS
 };
 
 Client.prototype.getPlayerID = function () {
-    return localStorage.getItem(Client.storageIDKey);
+    return localStorage.getItem(clientInstance.storageIDKey);
 };
 
 Client.prototype.hasAchievement = function (id) {
@@ -98,52 +98,52 @@ Client.prototype.getName = function () {
     return localStorage.getItem('name');
 };
 
-Client.socket.on('pid', function (playerID) { // the 'pid' event is used for the server to tell the client what is the ID of the player
-    Client.setLocalData(playerID);
+socket.on('pid', function (playerID) { // the 'pid' event is used for the server to tell the client what is the ID of the player
+clientInstance.setLocalData(playerID);
 });
 
-Client.socket.on(Client.initEventName, function (data) { // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
+socket.on(clientInstance.initEventName, function (data) { // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
     if (data instanceof ArrayBuffer) data = Decoder.decode(data, CoDec.initializationSchema); // if in binary format, decode first
-    Client.socket.emit('ponq', data.stamp); // send back a pong stamp to compute latency
+    socket.emit('ponq', data.stamp); // send back a pong stamp to compute latency
     Game.initWorld(data);
     Game.updateNbConnected(data.nbconnected);
 });
 
-Client.socket.on('update', function (data) { // This event triggers uppon receiving an update packet (data)
+socket.on('update', function (data) { // This event triggers uppon receiving an update packet (data)
     if (data instanceof ArrayBuffer) data = Decoder.decode(data, CoDec.finalUpdateSchema); // if in binary format, decode first
-    Client.socket.emit('ponq', data.stamp);  // send back a pong stamp to compute latency
+    socket.emit('ponq', data.stamp);  // send back a pong stamp to compute latency
     if (data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
     if (data.latency) Game.setLatency(data.latency);
     if (data.global) Game.updateWorld(data.global);
     if (data.local) Game.updateSelf(data.local);
 });
 
-Client.socket.on('reset', function (data) {
+socket.on('reset', function (data) {
     // If there is a mismatch between client and server coordinates, this event will reset the client to the server coordinates
     // data contains the correct position of the player
     Game.moveCharacter(Game.player.id, data, 0, Game.latency);
 });
 
-Client.socket.on('dbError', function () {
+socket.on('dbError', function () {
     // dbError is sent back from the server when the client attempted to connect by sending a player ID that has no match in the database
     localStorage.clear();
     Game.displayError();
 });
 
-Client.socket.on('wait', function () {
+socket.on('wait', function () {
     // wait is sent back from the server when the client attempts to connect before the server is done initializing and reading the map
     console.log('Server not ready, re-attempting...');
-    setTimeout(Client.requestData, 500); // Just try again in 500ms
+    setTimeout(clientInstance.requestData, 500); // Just try again in 500ms
 });
 
-Client.socket.on('chat', function (data) {
+socket.on('chat', function (data) {
     // chat is sent by the server when another nearby player has said something
     Game.playerSays(data.id, data.txt);
 });
 
 Client.prototype.sendPath = function (path, action, finalOrientation) {
     // Send the path that the player intends to travel
-    Client.socket.emit('path', {
+    socket.emit('path', {
         path: path,
         action: action,
         or: finalOrientation
@@ -153,16 +153,16 @@ Client.prototype.sendPath = function (path, action, finalOrientation) {
 Client.prototype.sendChat = function (txt) {
     // Send the text that the player wants to say
     if (!txt.length || txt.length > Game.maxChatLength) return;
-    Client.socket.emit('chat', txt);
+    socket.emit('chat', txt);
 };
 
 Client.prototype.sendRevive = function () {
     // Signal the server that the player wants to respawn
-    Client.socket.emit('revive');
+    socket.emit('revive');
 };
 
 Client.prototype.deletePlayer = function () {
     // Signal the server that the player wants to delete his character
-    Client.socket.emit('delete', { id: Client.getPlayerID() });
+    socket.emit('delete', { id: clientInstance.getPlayerID() });
     localStorage.clear();
 };
