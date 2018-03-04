@@ -9,10 +9,10 @@ window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 
 export default class Item {
-    constructor(x, y, key) {
+    constructor(game, x, y, key) {
         // key is a string indicating the atlas to use for the texture
-        window.Phaser.Sprite.call(this, this.game, x, y, key); // Call to constructor of parent
-        this.game.add.existing(this);
+        window.Phaser.Sprite.call(this, game, x, y, key); // Call to constructor of parent
+        game.add.existing(this);
         this.events.onKilled.addOnce(function (item) {
             item.recycle();
         }, this);

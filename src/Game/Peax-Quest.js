@@ -1,11 +1,12 @@
 import bootState from './states/boot';
 import loadState from './states/load';
 import menuState from './states/menu';
-// import playState from './states/play';
+import playState from './states/play';
 import winState from './states/win';
 import loseState from './states/lose';
-import homeState from  './client/home';
+import homeState from './client/home';
 import gameState from './client/game';
+
 
 window.PIXI = require('phaser-ce/build/custom/pixi');
 window.p2 = require('phaser-ce/build/custom/p2');
@@ -15,7 +16,7 @@ export default function PeaxQuest() {
     var game = new window.Phaser.Game(980, 500, window.Phaser.AUTO, 'myCanvas');
     // game.stage.disableVisibilityChange = true;
 
-    game.global={
+    game.global = {
         borderPadding: 10, // size of the gray border of the game window
         HUDheight: 32, // height of the HUD bar at the bottom (with life etc.)
         achievementsHolderWidth: 850,
@@ -24,10 +25,10 @@ export default function PeaxQuest() {
         defaultOrientation: 4, // Face down by default
         playerSpeed: 120, // number of ms that the movement tween takes to cross one tile (the lower the faster)
         playerLife: 100, // Max health of a player
-        cursor: 'url(/img/sprites/hand.png), auto', // image of the mouse cursor in normal circumstances
-        talkCursor: 'url(/img/sprites/talk.png), auto', // image of the cursor when hovering NPC
-        lootCursor: 'url(/img/sprites/loot.png), auto', // image of cursors when hovering loot
-        fightCursor: 'url(/img/sprites/sword.png), auto', // image of cursor when hovering monster
+        cursor: 'url(/assets/sprites/hand.png), auto', // image of the mouse cursor in normal circumstances
+        talkCursor: 'url(/assets/sprites/talk.png), auto', // image of the cursor when hovering NPC
+        lootCursor: 'url(/assets/sprites/loot.png), auto', // image of cursors when hovering loot
+        fightCursor: 'url(/assets/sprites/sword.png), auto', // image of cursor when hovering monster
         markerPosition: new window.Phaser.Point(), // current position of the square marker indicating the highlighted tile
         previousMarkerPosition: new window.Phaser.Point(), // previous position of that marker
         cameraFollowing: true, // is the camera centered on the player
@@ -44,17 +45,14 @@ export default function PeaxQuest() {
         clickDelay: window.Phaser.Timer.SECOND * 0.2, // minimum time between player mouse clicks
         clickEnabled: true // bool used to check if the player has clicked faster than the click delay
     }
-
-    game.plugins.add(this.PhaserInput.InputField); 
-
     game.state.add('boot', bootState);
-    // game.state.add('home', homeState);
+    game.state.add('home', homeState);
     game.state.add('load', loadState);
-    // game.state.add('menu', menuState);
-    // game.state.add('play', gameState);
-    // game.state.add('win', winState);
-    // game.state.add('lose', loseState);
-    // game.state.add('game', gameState);
+    game.state.add('menu', menuState);
+    game.state.add('play', gameState);
+    game.state.add('win', winState);
+    game.state.add('lose', loseState);
+    game.state.add('game', gameState);
 
     game.state.start('boot');
 

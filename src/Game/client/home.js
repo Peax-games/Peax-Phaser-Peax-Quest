@@ -1,12 +1,12 @@
 // import Input from 'orange-games';
 import Game from './game';
-var Client  = require('./client');
+var Client = require('./client');
 /**
  * Created by Jerome on 09-02-17.
  */
 export default function homeState(game) {
     var maxNameLength = 20; // max length of the name of the player
-
+    var db;
     return {
         init: function () {
             if (game.device.desktop == false) {
@@ -18,17 +18,17 @@ export default function homeState(game) {
             }
             game.scale.pageAlignHorizontally = true;
             // game.add.plugin(PhaserInput.InputField); // https://github.com/orange-games/phaser-input
-            Game.isNewPlayer = Client.isNewPlayer();
+            // Game.isNewPlayer = Client.isNewPlayer();
         },
-// JSONHash
+        // JSONHash
         preload: function () {
-            game.load.atlas('atlas1', 'img/sprites/atlas1.png', 'img/sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
-            game.load.atlas('atlas3', 'img/sprites/atlas3.png', 'img/sprites/atlas3.json'); // Items, weapons, armors
-            game.load.json('db', 'img/json/db.json');
+            game.load.atlas('atlas1', 'assets/sprites/atlas1.png', 'assets/sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
+            game.load.atlas('atlas3', 'assets/sprites/atlas3.png', 'assets/sprites/atlas3.json'); // Items, weapons, armors
+            game.load.json('db', 'assets/json/db.json');
         },
 
         create: function () {
-            Game.db = game.cache.getJSON('db');
+            db = game.cache.getJSON('db');
             // if (game.device.desktop == false) {
             //     game.scale.enterIncorrectOrientation.add(Game.displayOrientationScreen, this);
             //     game.scale.leaveIncorrectOrientation.add(Game.removeOrientationScreen, this);
@@ -40,7 +40,7 @@ export default function homeState(game) {
             document.onkeydown = this.handleKeyPress;
         },
 
-        displaythisScroll : function () {
+        displaythisScroll: function () {
             if (!this.scroll) this.makethisScroll();
             if (this.resetScroll && this.resetScroll.visible) this.resetScroll.hideTween.start();
             this.scroll.visible = true;
@@ -104,7 +104,7 @@ export default function homeState(game) {
         },
 
         makethisScroll: function () {
-            Game.isNewPlayer = Client.isNewPlayer();
+            // Game.isNewPlayer = Client.isNewPlayer();
             var truthy = true;
             this.scroll = this.makeScroll();
             this.setFadeTweens(this.scroll);
@@ -136,7 +136,7 @@ export default function homeState(game) {
                 // buttonY = 220;
             } else {
                 player = this.scroll.addChild(game.add.sprite(0, 100, 'atlas3', Client.getArmor() + '_31'));
-                
+
                 var wpn = Client.getWeapon();
                 var wpn;
                 var weapon = player.addChild(game.add.sprite(0, 0, 'atlas3', wpn + '_31'));

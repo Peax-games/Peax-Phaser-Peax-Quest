@@ -1,4 +1,3 @@
-
 import Game from './game';
 import Being from './being';
 /**
@@ -6,13 +5,14 @@ import Being from './being';
  */
 
 export default class Human {
-    constructor(x, y, key) {
+    constructor(game, x, y, key) {
         // Child of Being, parent of NPC and Player (the common aspect being the handling of speech bubbles)
         // key is a string indicating the atlas to use as texture
-        Being.call(this, x, y, key);
+        Being.call(this,game, x, y, key);
     }
 }
-Human.prototype = Object.create(Being);
+
+Human.prototype = Object.create(Being.prototype);
 Human.prototype.constructor = Human;
 
 Human.prototype.generateBubble = function () {

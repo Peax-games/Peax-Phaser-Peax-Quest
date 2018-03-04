@@ -1,8 +1,8 @@
 import io from 'socket.io-client';
 import EasyStar from 'easystarjs'
 import Factory from './factory';
-import Being from './being';
-
+import Player from './player-client';
+import Monster from './monster-client';
 
 window.PIXI = require('phaser-ce/build/custom/pixi');
 window.p2 = require('phaser-ce/build/custom/p2');
@@ -10,11 +10,8 @@ window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 var Decoder = require('./decoder');
 var Home = require('./home');
-var Human = require('./human');
 var CoDec = require('./CoDec');
-var Player = require('./player-client');
 var Item = require('./item-client');
-var Monster = require('./monster-client');
 var NPC = require('./npc');
 var AOIutils = require('./AOIutils');
 var spaceMap = require('./spaceMap');
@@ -24,7 +21,7 @@ var Client = require('./client');
  * E-mail: jerome.renaux@gmail.com
  */
 
-export default function GameState() {
+export default function GameState(game) {
     // used to map the orientation of the player, stored as a number, to the actual name of the orientation
     // (used to select the right animations to play, by name)
     var orientationsDict = {
@@ -50,7 +47,7 @@ export default function GameState() {
         }
     };
 
-
+    var loadingText;
     // this.init = function(game){
     this.easystar = new EasyStar.js();
     //     // this.canvas.style.cursor = this.cursor; // Sets the pointer to hand sprite
@@ -73,31 +70,34 @@ export default function GameState() {
             map[e.id] = key;
         });
     };
+    var db;
+    var HUD;
 
     return {
         create: function (game) {
-            this.HUD = this.add.group(); // Group containing all objects involved in the HUD
-            this.HUD.add(this.add.sprite(0, 0, 'atlas1', 'border')); // Adds the gray border of the this
-            this.displayLoadingScreen(); // Display the loading screen
+            db = game.cache.getJSON('db');
+            HUD = this.add.group(); // Group containing all objects involved in the HUD
+            HUD.add(this.add.sprite(0, 0, 'atlas1', 'border')); // Adds the gray border of the this
+            // this.displayLoadingScreen(); // Display the loading screen
 
             // A few maps mapping the name of an element (a monster, npc, item...) to its properties
             // Put before other functions, which might need it
-            this.itemsInfo = this.db.items;
-            this.npcInfo = this.db.npc;
-            this.monstersInfo = this.db.monsters;
-            this.findLocationAchievements(); // Scan the list of location-based achievements and store them somewhere
+            var itemsInfo = db.items;
+            var npcInfo = db.npc;
+            var monstersInfo = db.monsters;
+            // this.findLocationAchievements(); // Scan the list of location-based achievements and store them somewhere
 
             // A few maps mapping numerical id's to string keys
             this.itemsIDmap = {};
             this.monstersIDmap = {};
-            this.makeIDmap(this.itemsInfo, this.itemsIDmap);
-            this.makeIDmap(this.monstersInfo, this.monstersIDmap);
+            // this.makeIDmap(this.itemsInfo, this.itemsIDmap);
+            // this.makeIDmap(this.monstersInfo, this.monstersIDmap);
             this.entities = this.add.group(); // Group containing all the objects appearing on the map (npc, monster, items, players ...)
             this.scenery = this.add.group(); // Group containing all the animated sprites generated from the map
 
             this.displayMap(); // Reads the Tiled JSON to generate the map, manage layers, create collision array for the pathfinding and make a dictionary of teleports
-            this.displayScenery(); // Finds all "scenery" tiles in the map and replace them by animated sprites
-            this.displayNPC(); // Read the Tiled JSON and display the NPC
+            // this.displayScenery(); // Finds all "scenery" tiles in the map and replace them by animated sprites
+            // this.displayNPC(); // Read the Tiled JSON and display the NPC
 
             this.createMarker(); // Creates the marker following the pointer that highlight tiles
             this.makeHPtexts(); // Creates a pool of text elements to use to display HP
@@ -105,16 +105,16 @@ export default function GameState() {
 
             // Factories used to fecth unused sprites before creating new ones (or creating new ones when no other available)
             this.playerFactory = new Factory(function (x, y, key) {
-                return new Player(x, y, key);
+                return new Player(game, x, y, key);
             });
             this.itemFactory = new Factory(function (x, y, key) {
-                return new Item(x, y, key);
+                return new Item(game, x, y, key);
             });
             this.monsterFactory = new Factory(function (x, y, key) {
-                return new Monster(x, y, key);
+                return new Monster(game, x, y, key);
             });
 
-            Client.requestData();
+            // Client.requestData();
         },
 
         // Main update function; processes the global update packages received from the server
@@ -434,7 +434,7 @@ export default function GameState() {
             Client.emptyQueue(); // Process the queue of packets from the server that had to wait while the client was initializing
             this.groundMapLayers.setAll('visible', true);
             this.highMapLayers.setAll('visible', true);
-            this.scenery.setAll('visible',true);
+            this.scenery.setAll('visible', true);
             // Destroy loading screen
             this.loadingShade.destroy();
             this.loadingText.destroy();
@@ -599,28 +599,28 @@ export default function GameState() {
         },
 
         // Create the screen used to prompt the player to change the orientation of his device
-        makeOrientationScreen: function () {
-            this.orientationContainer = this.add.sprite(0, 0); // Create a container sprite
-            // Make black screen to cover the scene
-            this.orientationShade = this.orientationContainer.addChild(this.add.graphics(0, 0));
-            this.orientationShade.beginFill(0x000000, 1);
-            this.orientationShade.drawRect(0, 0, this.width, this.height);
-            this.orientationShade.endFill();
-            this.deviceImage = this.orientationContainer.addChild(this.add.sprite(this.width / 2, this.height / 2, 'atlas1', 'device'));
-            this.deviceImage.anchor.set(0.5);
-            this.rotateText = this.orientationContainer.addChild(this.add.text(0, 0, this.db.texts.orient, {
-                font: '40px pixel',
-                fill: "#ffffff",
-                stroke: "#000000",
-                strokeThickness: 3
-            }));
-            this.rotateText.x = this.width / 2 - this.rotateText.width / 2;
-            this.rotateText.y = this.deviceImage.y + this.deviceImage.height + 20;
-            this.rotateText.style.wordWrap = true;
-            this.rotateText.style.wordWrapWidth = 400;
-            this.orientationContainer.fixedToCamera = true;
-            this.orientationContainer.visible = false;
-        },
+        // makeOrientationScreen: function () {
+        //     this.orientationContainer = this.add.sprite(0, 0); // Create a container sprite
+        //     // Make black screen to cover the scene
+        //     this.orientationShade = this.orientationContainer.addChild(this.add.graphics(0, 0));
+        //     this.orientationShade.beginFill(0x000000, 1);
+        //     this.orientationShade.drawRect(0, 0, this.width, this.height);
+        //     this.orientationShade.endFill();
+        //     this.deviceImage = this.orientationContainer.addChild(this.add.sprite(this.width / 2, this.height / 2, 'atlas1', 'device'));
+        //     this.deviceImage.anchor.set(0.5);
+        //     this.rotateText = this.orientationContainer.addChild(this.add.text(0, 0, this.db.texts.orient, {
+        //         font: '40px pixel',
+        //         fill: "#ffffff",
+        //         stroke: "#000000",
+        //         strokeThickness: 3
+        //     }));
+        //     this.rotateText.x = this.width / 2 - this.rotateText.width / 2;
+        //     this.rotateText.y = this.deviceImage.y + this.deviceImage.height + 20;
+        //     this.rotateText.style.wordWrap = true;
+        //     this.rotateText.style.wordWrapWidth = 400;
+        //     this.orientationContainer.fixedToCamera = true;
+        //     this.orientationContainer.visible = false;
+        // },
 
         displayDeathScroll: function () { // Displayed when player dies
             if (!this.deathScroll) this.makeDeathScroll();
@@ -630,31 +630,31 @@ export default function GameState() {
 
         // Display an error message if the user id in localStorage has no match in the database;
         // called when receiving the error notification from the server
-        displayError: function () {
-            this.loadingText.text = this.db.texts.db_error;
-            this.loadingText.x = this.width / 2 - this.loadingText.width / 2;
-            this.loadingText.y = this.height / 2 - this.loadingText.height / 2;
-        },
+        // displayError: function () {
+        //     this.loadingText.text = this.db.texts.db_error;
+        //     this.loadingText.x = this.width / 2 - this.loadingText.width / 2;
+        //     this.loadingText.y = this.height / 2 - this.loadingText.height / 2;
+        // },
 
-        // Display the loading screen when the this starts, after clicking "play"
-        displayLoadingScreen: function () {
-            // Cover the screen with a black rectangle
-            this.loadingShade = this.add.graphics(0, 0);
-            this.loadingShade.beginFill(0x000000, 1);
-            this.loadingShade.drawRect(this.borderPadding, this.borderPadding, this.stage.width - (this.borderPadding * 2), this.stage.height - (this.borderPadding * 2));
-            this.loadingShade.endFill();
-            // Add some loading text (whos value is in this.db.texts) and center it
-            var loadingText = this.add.text(0, 0, 'loading...', {
-                font: '18px pixel',
-                fill: "#ffffff", // f4d442
-                stroke: "#000000",
-                strokeThickness: 3
-            });
-            this.loadingText.x = this.width / 2 - this.loadingText.width / 2;
-            this.loadingText.y = this.height / 2 - this.loadingText.height / 2;
-            this.loadingText.style.wordWrap = true;
-            this.loadingText.style.wordWrapWidth = 400;
-        },
+        // // Display the loading screen when the this starts, after clicking "play"
+        // displayLoadingScreen: function () {
+        //     // Cover the screen with a black rectangle
+        //     this.loadingShade = this.add.graphics(0, 0);
+        //     this.loadingShade.beginFill(0x000000, 1);
+        //     this.loadingShade.drawRect(this.borderPadding, this.borderPadding, this.stage.width - (this.borderPadding * 2), this.stage.height - (this.borderPadding * 2));
+        //     this.loadingShade.endFill();
+        //     // Add some loading text (whos value is in this.db.texts) and center it
+        //     var loadingText = this.add.text(0, 0, 'loading...', {
+        //         font: '18px pixel',
+        //         fill: "#ffffff", // f4d442
+        //         stroke: "#000000",
+        //         strokeThickness: 3
+        //     });
+        //     this.loadingText.x = this.width / 2 - this.loadingText.width / 2;
+        //     this.loadingText.y = this.height / 2 - this.loadingText.height / 2;
+        //     this.loadingText.style.wordWrap = true;
+        //     this.loadingText.style.wordWrapWidth = 400;
+        // },
 
         // Displays the screen used to prompt the player to change the orientation of his device;
         // called by the enterIncorrectOrientation callback
@@ -747,71 +747,71 @@ export default function GameState() {
 
         // ACHIEVEMENTS CODE : Code about handling achievements
 
-        handleLootAchievement: function (id) { // item id
-            var item = this.itemsInfo[this.itemsIDmap[id]];
-            if (item.type !== undefined) {
-                if (item.type == 1 && !this.weaponAchievement) {
-                    this.getAchievement(0);
-                    this.weaponAchievement = true;
-                } else if (item.type == 2 && !this.armorAchievement) {
-                    this.getAchievement(4);
-                    this.armorAchievement = true;
-                }
-            }
-        },
+        // handleLootAchievement: function (id) { // item id
+        //     var item = this.itemsInfo[this.itemsIDmap[id]];
+        //     if (item.type !== undefined) {
+        //         if (item.type == 1 && !this.weaponAchievement) {
+        //             this.getAchievement(0);
+        //             this.weaponAchievement = true;
+        //         } else if (item.type == 2 && !this.armorAchievement) {
+        //             this.getAchievement(4);
+        //             this.armorAchievement = true;
+        //         }
+        //     }
+        // },
 
-        handleSpeakAchievement: function () {
-            this.getAchievement(3);
-            this.speakAchievement = true;
-        },
+        // handleSpeakAchievement: function () {
+        //     this.getAchievement(3);
+        //     this.speakAchievement = true;
+        // },
 
-        handleKillAchievement: function (id) { // monster id
-            var nbKilled = localStorage.getItem('killed_' + id);
-            if (nbKilled === undefined) nbKilled = 0;
-            nbKilled++;
-            localStorage.setItem('killed_' + id, nbKilled);
-            var aid = this.monstersInfo[this.monstersIDmap[id]].achievement;
-            if (this.db.achievements[aid] && nbKilled >= this.db.achievements[aid].nb && !Client.hasAchievement(aid)) this.getAchievement(aid);
-        },
+        // handleKillAchievement: function (id) { // monster id
+        //     var nbKilled = localStorage.getItem('killed_' + id);
+        //     if (nbKilled === undefined) nbKilled = 0;
+        //     nbKilled++;
+        //     localStorage.setItem('killed_' + id, nbKilled);
+        //     var aid = this.monstersInfo[this.monstersIDmap[id]].achievement;
+        //     if (this.db.achievements[aid] && nbKilled >= this.db.achievements[aid].nb && !Client.hasAchievement(aid)) this.getAchievement(aid);
+        // },
 
-        handleLocationAchievements: function () {
-            if (this.inDoor || !this.locationAchievements.length) return;
-            var pos = this.computeTileCoords(this.player.x, this.player.y);
-            for (var i = this.locationAchievements.length - 1; i >= 0; i--) {
-                var area = this.locationAchievements[i];
-                if ((area.criterion == "in" && area.contains(pos.x, pos.y)) || (area.criterion == "out" && !area.contains(pos.x, pos.y))) {
-                    this.getAchievement(area.achID);
-                    this.locationAchievements.splice(i, 1);
-                }
-            }
-        },
+        // handleLocationAchievements: function () {
+        //     if (this.inDoor || !this.locationAchievements.length) return;
+        //     var pos = this.computeTileCoords(this.player.x, this.player.y);
+        //     for (var i = this.locationAchievements.length - 1; i >= 0; i--) {
+        //         var area = this.locationAchievements[i];
+        //         if ((area.criterion == "in" && area.contains(pos.x, pos.y)) || (area.criterion == "out" && !area.contains(pos.x, pos.y))) {
+        //             this.getAchievement(area.achID);
+        //             this.locationAchievements.splice(i, 1);
+        //         }
+        //     }
+        // },
 
-        getAchievement: function (id) { // achievement id
-            Client.setAchievement(id);
-            this.sounds.play('achievement');
-            this.achButton.blink = false;
-            if (!this.achTween.isRunning) this.achTween.start();
-            if (this.achTween.isPaused) this.achTween.resume();
-            this.achBar.visible = true;
-            this.achBar.upTween.start();
-            this.achBar.achName.text = this.db.achievements[id].name;
-            this.achBar.achName.x = Math.floor((this.achBar.width / 2) - (this.achBar.achName.width / 2));
-            this.updateAchievements();
-        },
+        // getAchievement: function (id) { // achievement id
+        //     Client.setAchievement(id);
+        //     this.sounds.play('achievement');
+        //     this.achButton.blink = false;
+        //     if (!this.achTween.isRunning) this.achTween.start();
+        //     if (this.achTween.isPaused) this.achTween.resume();
+        //     this.achBar.visible = true;
+        //     this.achBar.upTween.start();
+        //     this.achBar.achName.text = this.db.achievements[id].name;
+        //     this.achBar.achName.x = Math.floor((this.achBar.width / 2) - (this.achBar.achName.width / 2));
+        //     this.updateAchievements();
+        // },
 
-        findLocationAchievements: function () {
-            this.locationAchievements = [];
-            Object.keys(this.db.achievements).forEach(function (achID) {
-                if (Client.hasAchievement(achID)) return;
-                var ach = this.db.achievements[achID];
-                if (ach.locationAchievement) {
-                    var area = new window.Phaser.Rectangle(ach.rect.x, ach.rect.y, ach.rect.w, ach.rect.h);
-                    area.criterion = ach.criterion;
-                    area.achID = achID;
-                    this.locationAchievements.push(area);
-                }
-            });
-        },
+        // findLocationAchievements: function () {
+        //     this.locationAchievements = [];
+        //     Object.keys(db.achievements).forEach(function (achID) {
+        //         if (Client.hasAchievement(achID)) return;
+        //         var ach = this.db.achievements[achID];
+        //         if (ach.locationAchievement) {
+        //             var area = new window.Phaser.Rectangle(ach.rect.x, ach.rect.y, ach.rect.w, ach.rect.h);
+        //             area.criterion = ach.criterion;
+        //             area.achID = achID;
+        //             this.locationAchievements.push(area);
+        //         }
+        //     });
+        // },
 
         // =======================
         // POS CODE : Code for position and camera-related computations
@@ -1240,18 +1240,18 @@ export default function GameState() {
                 this.collisionArray.push(col);
             }
 
-            this.easystar.setGrid(this.collisionArray);
-            this.easystar.setAcceptableTiles([0]);
+            // this.easystar.setGrid(this.collisionArray);
+            // this.easystar.setAcceptableTiles([0]);
         },
 
-        createDoorsMap: function(){ // Create the associative array mapping coordinates to doors/teleports
+        createDoorsMap: function () { // Create the associative array mapping coordinates to doors/teleports
             // this.doors = new spaceMap();
             for (var d = 0; d < this.map.objects.doors.length; d++) {
                 var door = this.map.objects.doors[d];
                 var position = this.computeTileCoords(door.x, door.y);
                 this.doors.add(position.x, position.y, {
                     to: new window.Phaser.Point(door.properties.x * this.map.tileWidth, door.properties.y * this.map.tileWidth), // Where does the door teleports to
-                    camera: (door.properties.hasOwnProperty('cx') ? new window.Phaser.Point(door.properties.cx * this.map.tileWidth, door.properties.cy * this.map.tileWidth): null), // If set, will lock the camera at these coordinates (use for indoors locations)
+                    camera: (door.properties.hasOwnProperty('cx') ? new window.Phaser.Point(door.properties.cx * this.map.tileWidth, door.properties.cy * this.map.tileWidth) : null), // If set, will lock the camera at these coordinates (use for indoors locations)
                     orientation: door.properties.o, // What should be the orientation of the player after teleport
                     follow: door.properties.hasOwnProperty('follow'), // Should the camera keep following the player, even if indoors (automatically yes if outdoors)
                     // Below are the camera bounds in case of indoors following
@@ -1263,33 +1263,33 @@ export default function GameState() {
             }
         },
 
-        displayScenery: function () {
-            var scenery = this.db.scenery.scenery;
-            this.groundMapLayers.forEach(function (layer) {
-                for (var k = 0; k < scenery.length; k++) {
-                    this.map.createFromTiles(this.map.tileset.gid + scenery[k].id, -1, // tile id, replacemet
-                        'tileset', layer,// key of new sprite, layer
-                        this.scenery, // group added to
-                        {
-                            frame: scenery[k].frame,
-                            nbFrames: scenery[k].nbFrames,
-                            rate: 2
-                        });
-                }
-            });
-            this.scenery.setAll('visible', false);
-            this.scenery.forEach(this.basicAnimation, this);
-        },
+        // displayScenery: function () {
+        //     var scenery = this.db.scenery.scenery;
+        //     this.groundMapLayers.forEach(function (layer) {
+        //         for (var k = 0; k < scenery.length; k++) {
+        //             this.map.createFromTiles(this.map.tileset.gid + scenery[k].id, -1, // tile id, replacemet
+        //                 'tileset', layer,// key of new sprite, layer
+        //                 this.scenery, // group added to
+        //                 {
+        //                     frame: scenery[k].frame,
+        //                     nbFrames: scenery[k].nbFrames,
+        //                     rate: 2
+        //                 });
+        //         }
+        //     });
+        //     this.scenery.setAll('visible', false);
+        //     this.scenery.forEach(this.basicAnimation, this);
+        // },
 
-        displayNPC: function () {
-            var entities = this.cache.getJSON('entities'); // mapping from object IDs to sprites, the sprites being keys for the appropriate json file
-            for (var e = 0; e < this.map.objects.entities.length; e++) {
-                var object = this.map.objects.entities[e];
-                if (!entities.hasOwnProperty(object.gid - 1961)) continue; // 1961 is the starting ID of the npc tiles in the map ; this follows from how the map was made in the original BrowserQuest
-                var entityInfo = entities[object.gid - 1961];
-                // if(entityInfo.npc) this.basicAtlasAnimation(this.entities.add(new NPC(object.x, object.y, entityInfo.sprite)));
-            }
-        },
+        // displayNPC: function () {
+        //     var entities = this.cache.getJSON('entities'); // mapping from object IDs to sprites, the sprites being keys for the appropriate json file
+        //     for (var e = 0; e < this.map.objects.entities.length; e++) {
+        //         var object = this.map.objects.entities[e];
+        //         if (!entities.hasOwnProperty(object.gid - 1961)) continue; // 1961 is the starting ID of the npc tiles in the map ; this follows from how the map was made in the original BrowserQuest
+        //         var entityInfo = entities[object.gid - 1961];
+        //         // if(entityInfo.npc) this.basicAtlasAnimation(this.entities.add(new NPC(object.x, object.y, entityInfo.sprite)));
+        //     }
+        // },
 
         // ===========================
         // Mouse and click-related code

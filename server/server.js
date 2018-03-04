@@ -36,7 +36,7 @@ gs.server = server;
 // app.use(express.static(__dirname + '/../build'));
 // app.use('/css',express.static(__dirname + '/css'));
 app.use('/client',express.static(__dirname + '/client'));
-app.use('/img',express.static('/img'));
+app.use('/img',express.static('/assets'));
 
 
 // app.get('/',function(req,res){
