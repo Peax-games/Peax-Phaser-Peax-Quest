@@ -1,10 +1,13 @@
-var Game = require('./game');
+// import Input from 'orange-games';
+import Game from './game';
+import Client from './client';
 /**
  * Created by Jerome on 09-02-17.
  */
 export default function homeState(game) {
     var maxNameLength = 20; // max length of the name of the player
-
+    var db;
+    var something;
     return {
         init: function () {
             if (game.device.desktop == false) {
@@ -15,30 +18,31 @@ export default function homeState(game) {
                 }
             }
             game.scale.pageAlignHorizontally = true;
-            // game.add.plugin(Fabrique.Plugins.InputField); // https://github.com/orange-games/phaser-input
-            // Game.isNewPlayer = Client.isNewPlayer();
+            // game.add.plugin(PhaserInput.InputField); // https://github.com/orange-games/phaser-input
+            something = new Client();
+            Game.isNewPlayer = something.isNewPlayer();
         },
-// JSONHash
+        // JSONHash
         preload: function () {
-            game.load.atlas('atlas1', 'img/sprites/atlas1.png', 'img/sprites/atlas1.jsona'); // PNJ, HUD, marker, achievements ...
-            game.load.atlas('atlas3', 'img/sprites/atlas3.png', 'img/sprites/atlas3.jsona'); // Items, weapons, armors
-            // game.load.json('db', 'assets/json/db.json');
+            game.load.atlas('atlas1', 'assets/sprites/atlas1.png', 'assets/sprites/atlas1.json'); // PNJ, HUD, marker, achievements ...
+            game.load.atlas('atlas3', 'assets/sprites/atlas3.png', 'assets/sprites/atlas3.json'); // Items, weapons, armors
+            game.load.json('db', 'assets/json/db.json');
         },
 
         create: function () {
-            // Game.db = game.cache.getJSON('db');
+            db = game.cache.getJSON('db');
             // if (game.device.desktop == false) {
             //     game.scale.enterIncorrectOrientation.add(Game.displayOrientationScreen, this);
             //     game.scale.leaveIncorrectOrientation.add(Game.removeOrientationScreen, this);
             // }
-            // if (!Game.isNewPlayer) this.makeResetScroll();
+            if (!Game.isNewPlayer) this.makeResetScroll();
             this.displaythisScroll();
             this.displayLogo();
-            //this.displayLinks();
+            this.displayLinks();
             document.onkeydown = this.handleKeyPress;
         },
 
-        displaythisScroll : function () {
+        displaythisScroll: function () {
             if (!this.scroll) this.makethisScroll();
             if (this.resetScroll && this.resetScroll.visible) this.resetScroll.hideTween.start();
             this.scroll.visible = true;
@@ -102,16 +106,15 @@ export default function homeState(game) {
         },
 
         makethisScroll: function () {
-            // Game.isNewPlayer = Client.isNewPlayer();
-            var truthy = true;
+            Game.isNewPlayer = something.isNewPlayer();
             this.scroll = this.makeScroll();
             this.setFadeTweens(this.scroll);
 
-            this.makeTitle(this.scroll, (truthy ? 'Create a new character' : 'Load existing character'));
+            this.makeTitle(this.scroll, (Game.isNewPlayer ? 'Create a new character' : 'Load existing character'));
 
             var buttonY;
             var player;
-            if (truthy) {
+            if (Game.isNewPlayer) {
                 player = this.scroll.addChild(game.add.sprite(0, 110, 'atlas3', 'clotharmor_31'));
                 player.alpha = 0.5;
                 // this.inputField = this.scroll.addChild(game.add.inputField(185, 160, {
@@ -133,12 +136,12 @@ export default function homeState(game) {
                 // this.inputField.input.useHandCursor = false;
                 // buttonY = 220;
             } else {
-                // player = this.scroll.addChild(game.add.sprite(0, 100, 'atlas3', Client.getArmor() + '_31'));
-                
-                // var wpn = Client.getWeapon();
+                player = this.scroll.addChild(game.add.sprite(0, 100, 'atlas3', something.getArmor() + '_31'));
+
+                var wpn = something.getWeapon();
                 var wpn;
                 var weapon = player.addChild(game.add.sprite(0, 0, 'atlas3', wpn + '_31'));
-                // weapon.position.set(Game.db.items[wpn].offsets.x, Game.db.items[wpn].offsets.y);
+                weapon.position.set(Game.db.items[wpn].offsets.x, Game.db.items[wpn].offsets.y);
                 var name = player.addChild(game.add.text(0, 42, 'hi', {
                     font: '18px pixel',
                     fill: "#fff",
@@ -152,12 +155,12 @@ export default function homeState(game) {
             player.addChild(game.add.sprite(0, 5, 'atlas1', 'shadow'));
             player.anchor.set(0.25, 0.35);
             this.button = this.makeButton(this.scroll, buttonY, 'play', this.startGame);
-            // if (Game.isNewPlayer) this.disableButton();
+            if (!Game.isNewPlayer) this.disableButton();
             player.x = this.button.x - 18;
         },
         makeTitle: function (scroll, txt) {
             var titleY = 65;
-            var title = scroll.addChild(game.add.text(0, titleY, txt, {
+            var title = scroll.addChild(game.add.text(0, titleY, 'Name',{ 
                 font: '18px pixel',
                 fill: "#f4d442",
                 stroke: "#000000",
@@ -214,27 +217,24 @@ export default function homeState(game) {
             this.makeScrollLink(this.resetScroll, 'Cancel', this.displaythisScroll);
         },
         deletePlayer: function () {
-            // Client.deletePlayer();
+            something.deletePlayer();
             this.scroll.destroy();
             this.scroll = null;
             this.displaythisScroll();
         },
-        isNameEmpty: function () {
-            return (this.inputField.text.text.length == 0);
-        },
+        // isNameEmpty: function () {
+        //     return (this.inputField.text.text.length == 0);
+        // },
         startGame: function () {
             var ok = true;
-            // if (Game.isNewPlayer) {
-            //     if (!this.isNameEmpty()) {
-            //         Client.setName(this.inputField.text.text);
-            //     } else {
-            //         ok = false;
-            //     }
-            // }
+            if (Game.isNewPlayer) {
+                    something.setName('BluntsAlot');
+               
+            }
             if (ok) {
                 document.onkeydown = null;
                 this.scroll.hideTween.onComplete.add(function () {
-                    game.state.start('Game');
+                    game.state.start('game', false, true, {something: something});
                 }, this);
                 this.scroll.hideTween.start();
                 this.logo.hideTween.start();

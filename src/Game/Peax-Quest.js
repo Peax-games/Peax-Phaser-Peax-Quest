@@ -5,17 +5,18 @@ import playState from './states/play';
 import winState from './states/win';
 import loseState from './states/lose';
 import homeState from './client/home';
-var gameState =require('./client/game');
+import gameState from './client/game';
+
 
 window.PIXI = require('phaser-ce/build/custom/pixi');
 window.p2 = require('phaser-ce/build/custom/p2');
 window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 export default function PeaxQuest() {
-    var game = new window.Phaser.Game(24*32, 17*32, window.Phaser.AUTO, 'myCanvas');
+    var game = new window.Phaser.Game(980, 500, window.Phaser.AUTO, 'myCanvas');
     // game.stage.disableVisibilityChange = true;
 
-    game.global={
+    game.global = {
         borderPadding: 10, // size of the gray border of the game window
         HUDheight: 32, // height of the HUD bar at the bottom (with life etc.)
         achievementsHolderWidth: 850,
@@ -44,8 +45,6 @@ export default function PeaxQuest() {
         clickDelay: window.Phaser.Timer.SECOND * 0.2, // minimum time between player mouse clicks
         clickEnabled: true // bool used to check if the player has clicked faster than the click delay
     }
-
-
     game.state.add('boot', bootState);
     game.state.add('home', homeState);
     game.state.add('load', loadState);
@@ -53,6 +52,7 @@ export default function PeaxQuest() {
     game.state.add('play', gameState);
     game.state.add('win', winState);
     game.state.add('lose', loseState);
+    game.state.add('game', gameState);
 
     game.state.start('boot');
 

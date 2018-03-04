@@ -86,7 +86,7 @@ GameServer.readMap = function(){
     // GameServer.db.itemsIDmap = {}; // Make a map to easily fetch string keys based on numerical id's
     // GameServer.makeIDmap(GameServer.db.items,GameServer.db.itemsIDmap);
 
-    fs.readFile('public/img/maps/minimap_server.json', 'utf8', function (err, data) {
+    fs.readFile('public/assets/maps/minimap_server.json', 'utf8', function (err, data) {
         if (err) throw err;
         GameServer.map = JSON.parse(data);
         GameServer.objects = {};

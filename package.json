@@ -23,5 +23,8 @@
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:8081",
-  "main": "server/server.js"
+  "main": "server/server.js",
+  "devDependencies": {
+    "@orange-games/phaser-input": "^2.0.5"
+  }
 }
