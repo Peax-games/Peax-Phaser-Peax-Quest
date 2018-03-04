@@ -262,6 +262,7 @@ GameServer.checkPlayerID = function(id){ // check if no other player is using sa
 
 GameServer.addNewPlayer = function(socket,data){
     // data is the data object sent by the client to request the creation of a new plaer
+
     if(!data.name || data.name.length == 0) return;
     var player = new Player(data.name);
     var document = player.dbTrim();

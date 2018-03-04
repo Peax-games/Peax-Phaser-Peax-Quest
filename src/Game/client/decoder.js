@@ -3,14 +3,16 @@ import CoDec from './CoDec';
 /**
  * Created by Jerome on 13-01-17.
  */
-
+var myself;
 // This class is used to decode a binary encoded update package
-var Decoder = {};
+export default function Decoder(){
+    myself = this;
+};
 
 Decoder.decode = function(data,schema){
     // data is the binary object to decode
     // schema is the template of what to decode ; it indicates the names and types of the fields of the object, allowing to guide the decoding
-    var res = Decoder.decodeObject(data,0,schema);
+    var res = this.decodeObject(data,0,schema);
     return res.object;
 };
 
@@ -61,7 +63,7 @@ Decoder.decodeObject = function(pkg,offset,schema){
                 object[key] = dv['getUint' + (nbBytes * 8)](offset); // calls e.g. dv.getUint8, dv.getUint16 ... depending on how many bytes are indicated as necessary for the given field in the schema
                 offset += nbBytes;
             }
-            idx++;
+            idx+=1;
         });
     }
 
@@ -121,7 +123,7 @@ Decoder.decodeObject = function(pkg,offset,schema){
                         var id = dv['getUint'+(CoDec.bytesPerID*8)](offset); // ID of the entry (= key)
                         offset+=CoDec.bytesPerID;
                         //console.log("Decoding "+map+" element at offset "+offset);
-                        var res = Decoder.decodeObject(pkg, offset, schema.maps[map]);
+                        var res = this.decodeObject(pkg, offset, schema.maps[map]);
                         object[map][id] = res.object;
                         offset = res.offset;
                     }
@@ -145,13 +147,13 @@ Decoder.decodeObject = function(pkg,offset,schema){
 
     if(schema.booleans){
         //console.log('Decoding bools at offset '+offset);
-        var bools = dv['getUint'+(CoDec.booleanBytes*8)](offset); // just like propertiesMask, bools is a mask indicating the presence/absence of each boolean
+        var bools = dv['getUint'+(1*8)](offset); // just like propertiesMask, bools is a mask indicating the presence/absence of each boolean
         var boolidx = 1; // index of the next boolean to decode
-        offset+=CoDec.booleanBytes;
+        offset+=1;
         schema.booleans.forEach(function (key) {
             if(Decoder.isMaskTrue(propertiesMask,nbProperties,idx)) object[key] = !!Decoder.isMaskTrue(bools,schema.booleans.length,boolidx); // !! converts to boolean
-            idx++;
-            boolidx++;
+            idx+=1;
+            boolidx+=1;
         });
     }
     return {object:object,offset:offset};
@@ -164,8 +166,8 @@ Decoder.isMaskTrue = function(mask,nbProperties,idx){ // Process a bitmask to kn
 Decoder.decodeString = function(view,length,offset) { // Read length bytes starting at a specific offset to decode a string
     var chars = [];
     for(var i = 0; i < length; i++){
-        chars.push(String.fromCharCode(view['getUint'+(CoDec.bytesPerChar*8)](offset)));
-        offset += CoDec.bytesPerChar;
+        chars.push(String.fromCharCode(view['getUint'+(1*8)](offset)));
+        offset += 1;
     }
     return chars.join('');
 };

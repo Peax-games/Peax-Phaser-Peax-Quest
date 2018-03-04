@@ -1,14 +1,14 @@
-import Game from './game';
+import Game from '../states/game';
 import Being from './being';
 /**
  * Created by Jerome on 25-02-17.
  */
 
 export default class Human {
-    constructor(game, x, y, key) {
+    constructor( game,x, y, key) {
         // Child of Being, parent of NPC and Player (the common aspect being the handling of speech bubbles)
         // key is a string indicating the atlas to use as texture
-        Being.call(this,game, x, y, key);
+        Being.call(this, game, x, y, key);
     }
 }
 

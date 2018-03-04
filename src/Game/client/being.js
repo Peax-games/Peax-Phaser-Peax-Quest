@@ -3,22 +3,22 @@
  * Updated by Christopher & Kaycee on 3-3-18
  */
 import Monster from './monster-client';
-import Game from './game';
+import Game from '../states/game';
 import Player from './player-client';
 
-// window.PIXI = require('phaser-ce/build/custom/pixi');
-// window.p2 = require('phaser-ce/build/custom/p2');
-// window.Phaser = require('phaser-ce/build/custom/phaser-split');
+window.PIXI = require('phaser-ce/build/custom/pixi');
+window.p2 = require('phaser-ce/build/custom/p2');
+window.Phaser = require('phaser-ce/build/custom/phaser-split');
 
 var Client = require('./client');
 
 // Helper function to make a sprite object absorb all the properties of a provided JSON object; Object.assign() should work as well
-// window.Phaser.Sprite.prototype.absorbProperties = function (object) {
-//     for (var key in object) {
-//         if (!object.hasOwnProperty(key)) continue;
-//         this[key] = object[key];
-//     }
-// };
+window.Phaser.Sprite.prototype.absorbProperties = function (object) {
+    for (var key in object) {
+        if (!object.hasOwnProperty(key)) continue;
+        this[key] = object[key];
+    }
+};
 
 var orientationsDict = {
     1: 'left',
@@ -29,12 +29,12 @@ var orientationsDict = {
 
 // Being is the topmost class encompassing all "living" sprites, be it players, NPC or monsters (not items)
 export default class Being {
-    constructor(game, x, y, key) {
+    constructor( game, x, y, key) {
         // key is the string indicating which atlas to use
-        window.Phaser.Sprite.call(this, this.game, x, y, key); // Call to constructor of parent
+        window.Phaser.Sprite.call(this, game, x, y, key); // Call to constructor of parent
         this.speed = 0;
         this.destination = null;
-        this.game.add.existing(this);
+        game.add.existing(this);
     }
 };
 Being.prototype = Object.create(window.Phaser.Sprite.prototype); // Declares the inheritance relationship
