@@ -14,9 +14,9 @@ window.Phaser = require('phaser-ce/build/custom/phaser-split');
  */
 
 export default class Player {
-    constructor(game, x, y, key) {
+    constructor( x, y, key) {
         // key is a string indicating the atlas to use as texture
-        Human.call(this, game, x, y, key); // Send context as first argument!!
+        Human.call(this, x, y, key); // Send context as first argument!!
         this.anchor.set(0.25, 0.35);
         this.orientation = 4; // down
         this.speed = Game.playerSpeed;

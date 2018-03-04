@@ -1,20 +1,21 @@
 import io from 'socket.io-client';
 import Game from './game';
+import Decoder from './decoder';
+import CoDec from './CoDec';
 
-var CoDec = require('./CoDec');
 
-var Decoder = require('./decoder');
 /**
  * Created by Jerome on 21-10-16.
  */
 
+
 export default class Client {
     constructor() {
-        eventsQueue: []; // when events arrive before the flag playerIsInitialized is set to true, they are not processed
+        this.eventsQueue= []; // when events arrive before the flag playerIsInitialized is set to true, they are not processed
         // and instead are queued in this array ; they will be processed once the client is initialized and Client.emptyQueue() has been called
-        initEventName: 'init'; // name of the event that triggers the call to initWorld() and the initialization of the game
-        storageNameKey: 'playerName'; // key in localStorage of the player name
-        storageIDKey: 'playerID';// key in localStorage of player ID
+        this.initEventName= 'init'; // name of the event that triggers the call to initWorld() and the initialization of the game
+        this.storageNameKey= 'playerName'; // key in localStorage of the player name
+        this.storageIDKey= 'playerID';// key in localStorage of player ID
     } 
 };
 var socket = io();
@@ -30,7 +31,8 @@ socket.onevent = function (packet) {
         onevent.call(this, packet);    // original call
     }
 };
-
+// var DECO = new Decoder();
+// var CoDo = new CoDec();
 Client.emptyQueue = function () { // Process the events that have been queued during initialization
     for (var e = 0; e < clientInstance.eventsQueue.length; e++) {
         onevent.call(socket, clientInstance.eventsQueue[e]);
@@ -103,14 +105,16 @@ clientInstance.setLocalData(playerID);
 });
 
 socket.on(clientInstance.initEventName, function (data) { // This event triggers when receiving the initialization packet from the server, to use in Game.initWorld()
-    if (data instanceof ArrayBuffer) data = Decoder.decode(data, CoDec.initializationSchema); // if in binary format, decode first
-    socket.emit('ponq', data.stamp); // send back a pong stamp to compute latency
-    Game.initWorld(data);
-    Game.updateNbConnected(data.nbconnected);
+    // if (data instanceof ArrayBuffer) data = DECO.decode(data, CoDo.initializationSchema); // if in binary format, decode first
+    var gamo = new Game();
+    socket.emit('pong', data.stamp); // send back a pong stamp to compute latency
+    gamo.initWorld(data);
+    gamo.updateNbConnected(data.nbconnected);
 });
 
 socket.on('update', function (data) { // This event triggers uppon receiving an update packet (data)
-    if (data instanceof ArrayBuffer) data = Decoder.decode(data, CoDec.finalUpdateSchema); // if in binary format, decode first
+    
+    // if (data instanceof ArrayBuffer) data = DECO.decode(data, finalUpdateSchema); // if in binary format, decode first
     socket.emit('ponq', data.stamp);  // send back a pong stamp to compute latency
     if (data.nbconnected !== undefined) Game.updateNbConnected(data.nbconnected);
     if (data.latency) Game.setLatency(data.latency);

@@ -5,10 +5,10 @@ import Being from './being';
  */
 
 export default class Human {
-    constructor(game, x, y, key) {
+    constructor( x, y, key) {
         // Child of Being, parent of NPC and Player (the common aspect being the handling of speech bubbles)
         // key is a string indicating the atlas to use as texture
-        Being.call(this,game, x, y, key);
+        Being.call(this, x, y, key);
     }
 }
 

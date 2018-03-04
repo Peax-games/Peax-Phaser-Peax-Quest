@@ -29,9 +29,9 @@ var orientationsDict = {
 
 // Being is the topmost class encompassing all "living" sprites, be it players, NPC or monsters (not items)
 export default class Being {
-    constructor(game, x, y, key) {
+    constructor( x, y, key) {
         // key is the string indicating which atlas to use
-        window.Phaser.Sprite.call(this, this.game, x, y, key); // Call to constructor of parent
+        window.Phaser.Sprite.call(this.game, x, y, key); // Call to constructor of parent
         this.speed = 0;
         this.destination = null;
         this.game.add.existing(this);

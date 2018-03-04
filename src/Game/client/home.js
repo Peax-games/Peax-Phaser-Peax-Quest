@@ -38,7 +38,7 @@ export default function homeState(game) {
             if (!Game.isNewPlayer) this.makeResetScroll();
             this.displaythisScroll();
             this.displayLogo();
-            this.displayLinks();
+            // this.displayLinks();
             document.onkeydown = this.handleKeyPress;
         },
 

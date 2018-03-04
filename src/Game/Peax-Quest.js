@@ -1,3 +1,4 @@
+
 import bootState from './states/boot';
 import loadState from './states/load';
 import menuState from './states/menu';
@@ -17,6 +18,7 @@ export default function PeaxQuest() {
     // game.stage.disableVisibilityChange = true;
 
     game.global = {
+        height: 980,
         borderPadding: 10, // size of the gray border of the game window
         HUDheight: 32, // height of the HUD bar at the bottom (with life etc.)
         achievementsHolderWidth: 850,
@@ -45,14 +47,14 @@ export default function PeaxQuest() {
         clickDelay: window.Phaser.Timer.SECOND * 0.2, // minimum time between player mouse clicks
         clickEnabled: true // bool used to check if the player has clicked faster than the click delay
     }
+    window.game = game;
     game.state.add('boot', bootState);
     game.state.add('home', homeState);
     game.state.add('load', loadState);
     game.state.add('menu', menuState);
-    game.state.add('play', gameState);
     game.state.add('win', winState);
     game.state.add('lose', loseState);
-    game.state.add('game', gameState);
+    game.state.add('game', new gameState);
 
     game.state.start('boot');
 

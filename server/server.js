@@ -77,10 +77,12 @@ server.listen(myArgs.p || process.env.PORT || 8081,function(){ // -p flag to spe
     server.clientUpdateRate = 1000/5; // Rate at which update packets are sent
     gs.readMap();
     server.setUpdateLoop();
+    
 
     mongo.connect('mongodb://'+mongoHost+'/'+mongoDBName,function(err,db){
+        const myAwesomeDB = db.db('heroku_gbqv56ps')
         if(err) throw(err);
-        server.db = db;
+        server.db = myAwesomeDB;
         console.log('Connection to db established');
     });
 });
